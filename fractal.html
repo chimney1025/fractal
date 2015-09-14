@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sierpinski Triangle</title>
+
+    <link href="assets/styles.css" rel="stylesheet">
+</head>
+
+<body>
+<div id="config">
+    <div>
+        <button id="zoomIn">Zoom In + </button>
+        <button id="zoomOut">Zoom Out - </button>
+    </div>
+    <div class="panning">
+        <button id="moveUp">Up</button>
+        <br>
+        <button id="moveLeft">Left</button>
+        <button id="moveRight">Right</button>
+        <br>
+        <button id="moveDown">Down</button>
+    </div>
+    <div>
+        <button id="reset">Reset</button>
+    </div>
+</div>
+<canvas id="canvas" width="500" height="500"></canvas>
+
+
+<script src="assets/triangle.js"></script>
+<script>
+    var canvas = document.getElementById("canvas");
+    var triangle = new Triangle(canvas);
+    triangle.draw();
+
+    document.getElementById("zoomIn").addEventListener("click", function(){
+        triangle.reset();
+        triangle.zoom(1.1, 1.1);
+        triangle.draw();
+    });
+
+    document.getElementById("zoomOut").addEventListener("click", function(){
+        triangle.reset();
+        triangle.zoom(0.9, 0.9);
+        triangle.draw();
+    });
+
+    document.getElementById("moveLeft").addEventListener("click", function(){
+        triangle.reset();
+        triangle.move(-10, 0);
+        triangle.draw();
+    });
+
+    document.getElementById("moveRight").addEventListener("click", function(){
+        triangle.reset();
+        triangle.move(10, 0);
+        triangle.draw();
+    });
+
+    document.getElementById("moveUp").addEventListener("click", function(){
+        triangle.reset();
+        triangle.move(0, -10);
+        triangle.draw();
+    });
+
+    document.getElementById("moveDown").addEventListener("click", function(){
+        triangle.reset();
+        triangle.move(0, 10);
+        triangle.draw();
+    });
+
+    document.getElementById("moveDown").addEventListener("click", function(){
+        triangle.reset();
+        var canvas = document.getElementById("canvas");
+        triangle = new Triangle(canvas);
+        triangle.draw();
+    });
+
+</script>
+
+</body>
+</html>
