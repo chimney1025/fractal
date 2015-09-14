@@ -1,13 +1,21 @@
-var Triangle = function (canvas) {
+function Triangle(canvas) {
     var limit = 10;
+    var dragging;
+    var mouseX;
+    var mouseY;
+    var dragHoldX;
+    var dragHoldY;
 
     var pencil = canvas.getContext("2d");
+    var bRect = canvas.getBoundingClientRect();
+    canvas.addEventListener("mousedown", mouseDownListener, false);
+
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
 
-    var edgeLength = canvas.width;
+    var edgeLength = (canvas.width<canvas.height)?canvas.width:canvas.height;
 
-    pencil.translate(edgeLength/2, edgeLength/2);
+    pencil.translate(canvas.width/2, canvas.height/2);
 
     var pos1 = {
         x: 0,
@@ -22,19 +30,62 @@ var Triangle = function (canvas) {
         y: edgeLength / 2
     };
 
-    var checkLimit = function (edgeLength) {
-        return edgeLength > limit;
-    };
+    function checkHit() {
 
-    var drawTriangle = function (pos1, pos2, pos3) {
+    }
+
+    function mouseDownListener(event) {
+        mouseX = (event.clientX - bRect.left)*(canvas.width/bRect.width);
+        mouseY = (event.clientY - bRect.top)*(canvas.height/bRect.height);
+
+        dragging = true;
+        window.addEventListener("mousemove", mouseMoveListener, false);
+        canvas.removeEventListener("mousedown", mouseDownListener, false);
+        window.addEventListener("mouseup", mouseUpListener, false);
+
+        if (event.preventDefault) {
+            event.preventDefault();
+        } else if (event.returnValue) {
+            event.returnValue = false;
+        }
+        return false;
+    }
+
+    function mouseMoveListener(event) {
+        var mouseCrtX = (event.clientX - bRect.left)*(canvas.width/bRect.width);
+        var mouseCrtY = (event.clientY - bRect.top)*(canvas.height/bRect.height);
+
+        var moveX = mouseCrtX - mouseX;
+        var moveY = mouseCrtY - mouseY;
+
+        _reset();
+        _move(moveX, moveY);
+        initTriangle();
+        _draw(pos1, pos2, pos3);
+    }
+
+    function mouseUpListener(event) {
+        canvas.addEventListener("mousedown", mouseDownListener, false);
+        window.removeEventListener("mouseup", mouseUpListener, false);
+        if (dragging) {
+            dragging = false;
+            window.removeEventListener("mousemove", mouseMoveListener, false);
+        }
+    }
+
+    function checkLimit(edgeLength) {
+        return edgeLength > limit;
+    }
+
+    function drawTriangle(pos1, pos2, pos3) {
         pencil.beginPath();
         pencil.moveTo(pos1.x, pos1.y);
         pencil.lineTo(pos2.x, pos2.y);
         pencil.lineTo(pos3.x, pos3.y);
         pencil.fill();
-    };
+    }
 
-    var drawTopTriangle = function (pos1, pos2, pos3) {
+    function drawTopTriangle(pos1, pos2, pos3) {
         var p1 = {
             x: pos1.x,
             y: pos1.y
@@ -49,9 +100,9 @@ var Triangle = function (canvas) {
         };
 
         _draw(p1, p2, p3);
-    };
+    }
 
-    var drawLeftTriangle = function (pos1, pos2, pos3) {
+    function drawLeftTriangle(pos1, pos2, pos3) {
         var p1 = {
             x: (pos1.x + pos2.x) / 2,
             y: (pos1.y + pos2.y) / 2
@@ -66,9 +117,9 @@ var Triangle = function (canvas) {
         };
 
         _draw(p1, p2, p3);
-    };
+    }
 
-    var drawRightTriangle = function (pos1, pos2, pos3) {
+    function drawRightTriangle(pos1, pos2, pos3) {
         var p1 = {
             x: (pos1.x + pos3.x) / 2,
             y: (pos1.y + pos3.y) / 2
@@ -83,9 +134,9 @@ var Triangle = function (canvas) {
         };
 
         _draw(p1, p2, p3);
-    };
+    }
 
-    var drawInnerTriangle = function (pos1, pos2, pos3) {
+    function drawInnerTriangle(pos1, pos2, pos3) {
         var p1 = {
             x: (pos1.x + pos2.x) / 2,
             y: (pos1.y + pos2.y) / 2
@@ -102,31 +153,31 @@ var Triangle = function (canvas) {
         };
 
         drawTriangle(p1, p2, p3);
-    };
+    }
 
-    var _draw = function (pos1, pos2, pos3) {
+    function _draw(pos1, pos2, pos3) {
         if (checkLimit(pos3.x - pos2.x)) {
             drawInnerTriangle(pos1, pos2, pos3);
             drawTopTriangle(pos1, pos2, pos3);
             drawLeftTriangle(pos1, pos2, pos3);
             drawRightTriangle(pos1, pos2, pos3);
         }
-    };
+    }
 
-    var _move = function (x, y) {
+    function _move(x, y) {
         pencil.translate(x, y);
-    };
+    }
 
-    var _zoom = function(x, y) {
+    function _zoom(x, y) {
         pencil.scale(x, y);
         limit = limit / x;
-    };
+    }
 
-    var _reset = function() {
+    function _reset() {
         pencil.clearRect(pos2.x, pos1.y, edgeLength+10, edgeLength+10);
     };
 
-    var initTriangle = function () {
+    function initTriangle() {
 
         pencil.beginPath();
         pencil.moveTo(pos1.x, pos1.y);
@@ -145,15 +196,24 @@ var Triangle = function (canvas) {
         },
 
         move: function (x, y) {
+            _reset();
             _move(x, y);
+            initTriangle();
+            _draw(pos1, pos2, pos3);
+
         },
 
         zoom: function (x, y) {
+            _reset();
             _zoom(x, y);
+            initTriangle();
+            _draw(pos1, pos2, pos3);
         },
 
         reset: function() {
             _reset();
+            initTriangle();
+            _draw(pos1, pos2, pos3);
         }
     };
 };

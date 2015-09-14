@@ -3,7 +3,7 @@
 <head>
     <title>Sierpinski Triangle</title>
 
-    <link href="assets/styles.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
 </head>
 
 <body>
@@ -24,31 +24,25 @@
         <button id="reset">Reset</button>
     </div>
 </div>
-<canvas id="canvas" width="500" height="500"></canvas>
+<canvas id="canvas" width="800" height="500"></canvas>
 
 
-<script src="assets/triangle.js"></script>
+<script src="triangle.js"></script>
 <script>
     var canvas = document.getElementById("canvas");
     var triangle = new Triangle(canvas);
     triangle.draw();
 
     document.getElementById("zoomIn").addEventListener("click", function(){
-        triangle.reset();
         triangle.zoom(1.1, 1.1);
-        triangle.draw();
     });
 
     document.getElementById("zoomOut").addEventListener("click", function(){
-        triangle.reset();
         triangle.zoom(0.9, 0.9);
-        triangle.draw();
     });
 
     document.getElementById("moveLeft").addEventListener("click", function(){
-        triangle.reset();
         triangle.move(-10, 0);
-        triangle.draw();
     });
 
     document.getElementById("moveRight").addEventListener("click", function(){
@@ -58,22 +52,15 @@
     });
 
     document.getElementById("moveUp").addEventListener("click", function(){
-        triangle.reset();
         triangle.move(0, -10);
-        triangle.draw();
     });
 
     document.getElementById("moveDown").addEventListener("click", function(){
-        triangle.reset();
         triangle.move(0, 10);
-        triangle.draw();
     });
 
-    document.getElementById("moveDown").addEventListener("click", function(){
+    document.getElementById("reset").addEventListener("click", function(){
         triangle.reset();
-        var canvas = document.getElementById("canvas");
-        triangle = new Triangle(canvas);
-        triangle.draw();
     });
 
 </script>
