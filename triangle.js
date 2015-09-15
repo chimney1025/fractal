@@ -3,8 +3,6 @@ function Triangle(canvas, edgeLength) {
     var dragging;
     var mouseX;
     var mouseY;
-    var dragHoldX;
-    var dragHoldY;
     var pos1;
     var pos2;
     var pos3;
