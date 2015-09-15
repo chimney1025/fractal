@@ -8,6 +8,7 @@ function Triangle(canvas, edgeLength) {
     var pos1;
     var pos2;
     var pos3;
+	var scale = 1;
 
     var edgeLength = edgeLength || ((canvas.width<canvas.height)?canvas.width:canvas.height) ;
 
@@ -18,6 +19,7 @@ function Triangle(canvas, edgeLength) {
 
     var bRect = canvas.getBoundingClientRect();
     canvas.addEventListener("mousedown", mouseDownListener, false);
+    canvas.addEventListener("mousewheel", mouseWheelListener, false);
 
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
@@ -25,6 +27,15 @@ function Triangle(canvas, edgeLength) {
     function checkHit() {
 
     }
+	
+	function mouseWheelListener(event) {
+		var wheel = event.wheelDelta/12;
+		
+		_reset();
+        _zoom(wheel);
+        drawTriangle(pos1, pos2, pos3, true);
+        _draw(pos1, pos2, pos3);
+	}
 
     function mouseDownListener(event) {
         mouseX = (event.clientX - bRect.left)*(canvas.width/bRect.width);
@@ -165,18 +176,29 @@ function Triangle(canvas, edgeLength) {
     }
 
     function _move(x, y) {
-        pencil.translate(x, y);
+        pencil.translate(x/scale, y/scale);
     }
 
     function _zoom(n) {
-        //pencil.scale(x, y);
-        //limit = limit / x;
-        edgeLength += n;
-		initPos();
+		if( (n < 0 && checkLimit(edgeLength + n/scale) ) || n>0 ) {
+			edgeLength += n/scale;
+			initPos();
+		}
     }
+	
+	function _scale(n) {
+		scale *= n;
+		if( (n < 1 && limit < 100) || n > 1) {
+			pencil.scale(n, n);
+			limit = limit / n;
+		}
+	}
 
     function _reset() {
-        pencil.clearRect(0-canvas.width/2, 0-canvas.height/2, canvas.width, canvas.height);
+        //pencil.clearRect(0-canvas.width/2, 0-canvas.height/2, canvas.width, canvas.height);
+		//pencil.clearRect(pos2.x-10, pos1.y-10, (pos3.x - pos2.x + 10), (pos3.y - pos1.y + 10));
+		//set a larger area as otherwise the 'border' will be left
+		pencil.clearRect(0-edgeLength, 0-edgeLength, edgeLength*2, edgeLength*2);
     }
 
     function initPos() {
@@ -211,6 +233,13 @@ function Triangle(canvas, edgeLength) {
         zoom: function (n) {
             _reset();
             _zoom(n);
+            drawTriangle(pos1, pos2, pos3, true);
+            _draw(pos1, pos2, pos3);
+        },
+
+        scale: function (n) {
+            _reset();
+            _scale(n);
             drawTriangle(pos1, pos2, pos3, true);
             _draw(pos1, pos2, pos3);
         },

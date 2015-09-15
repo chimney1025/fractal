@@ -10,15 +10,72 @@ body {
     background-color: #fff;
     border: 2px solid #aaa;
     z-index: 0;
-    cursor: grab;
 }
+
+#canvas:active {
+    cursor: move;
+}
+
 #config {
     position: absolute;
     top: 10px;
-    left: 10px;
+    right: 10px;
     z-index: 1;
     text-align: center;
 }
+
+.control {
+	-moz-user-select: none;
+	box-shadow: 0px 1px 4px -1px rgba(0, 0, 0, 0.3); 
+	border-radius: 2px; 
+	cursor: pointer; 
+	background-color: rgb(255, 255, 255); 
+	width: 28px; 
+	height: 55px;
+}
+
+.control > div {
+	position: relative; 
+	width: 28px; 
+	height: 27px; 
+	left: 0px; 
+	top: 0px;
+}
+
+.control > div > div {
+	overflow: hidden; 
+	position: absolute; 
+	width: 15px; 
+	height: 15px; 
+	left: 7px; 
+	top: 6px;
+}
+
+img#zoomIn {
+	position: absolute; 
+	left: 0px; 
+	top: 0px; 
+	-moz-user-select: none; 
+	border: 0px none; 
+	padding: 0px; 
+	margin: 0px; 
+	width: 120px; 
+	height: 54px;
+}
+
+img#zoomOut {
+	position: absolute; 
+	left: 0px; 
+	top: -15px; 
+	-moz-user-select: none; 
+	border: 0px none; 
+	padding: 0px; 
+	margin: 0px; 
+	width: 120px; 
+	height: 54px;
+}
+
+
 button {
     border: 0 none;
     font-size: 13px;

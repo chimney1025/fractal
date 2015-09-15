@@ -8,17 +8,41 @@
 
 <body>
 <div id="config">
-    <div>
-        <button class="zoom" id="zoomIn">Zoom In + </button>
-        <button class="zoom" id="zoomOut">Zoom Out - </button>
-        <button id="moveUp">Up</button>
-        <button id="moveLeft">Left</button>
-        <button id="moveRight">Right</button>
-        <button id="moveDown">Down</button>
-        <button class="reset" id="reset">Reset</button>
-    </div>
+	<!--
+        <button class="zoom-out" id="zoomOut">Zoom Out - </button>
+        <button class="up" id="moveUp">Up</button>
+        <button class="left" id="moveLeft">Left</button>
+        <button class="right" id="moveRight">Right</button>
+        <button class="down" id="moveDown">Down</button>
+	
+	<span class="in" id="zoomIn"></span>
+	<span class="out" id="zoomOut"></span>
+	<span class="up" id="moveUp"></span>
+	<span class="down" id="moveDown"></span>
+	<span class="left" id="moveLeft"></span>
+	<span class="right" id="moveRight"></span>
+	-->
+	
+	<div class="control">
+		<div title="Zoom in">
+			<div>
+				<img id="zoomIn" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
+			</div>
+		</div>
+		
+		<div title="Zoom out" id="zoomOut">
+			<div>
+				<img id="zoomOut" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
+			</div>
+		</div>
+	</div>
+	
+    <button class="zoom" id="scaleIn">Scale In + </button>
+    <button class="zoom" id="scaleOut">Scale Out - </button>
+	
 </div>
-<canvas id="canvas" width="400" height="200"></canvas>
+
+<canvas id="canvas" width="800" height="400"></canvas>
 
 
 <script src="triangle.js"></script>
@@ -35,6 +59,14 @@
         triangle.zoom(-10);
     });
 
+    document.getElementById("scaleIn").addEventListener("click", function(){
+        triangle.scale(1.25);
+    });
+
+    document.getElementById("scaleOut").addEventListener("click", function(){
+        triangle.scale(0.8);
+    });
+
     document.getElementById("moveLeft").addEventListener("click", function(){
         triangle.move(-10, 0);
     });
@@ -49,10 +81,6 @@
 
     document.getElementById("moveDown").addEventListener("click", function(){
         triangle.move(0, 10);
-    });
-
-    document.getElementById("reset").addEventListener("click", function(){
-        triangle.reset();
     });
 
 </script>
