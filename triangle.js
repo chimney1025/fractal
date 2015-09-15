@@ -5,30 +5,21 @@ function Triangle(canvas) {
     var mouseY;
     var dragHoldX;
     var dragHoldY;
+    var pos1;
+    var pos2;
+    var pos3;
+
+    var edgeLength = (canvas.width<canvas.height)?canvas.width:canvas.height;
 
     var pencil = canvas.getContext("2d");
+
+    initPos();
+
     var bRect = canvas.getBoundingClientRect();
     canvas.addEventListener("mousedown", mouseDownListener, false);
 
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
-
-    var edgeLength = (canvas.width<canvas.height)?canvas.width:canvas.height;
-
-    pencil.translate(canvas.width/2, canvas.height/2);
-
-    var pos1 = {
-        x: 0,
-        y: 0 - edgeLength / 2
-    };
-    var pos2 = {
-        x: 0 - edgeLength / 2,
-        y: edgeLength / 2
-    };
-    var pos3 = {
-        x: edgeLength / 2,
-        y: edgeLength / 2
-    };
 
     function checkHit() {
 
@@ -171,11 +162,30 @@ function Triangle(canvas) {
     function _zoom(x, y) {
         pencil.scale(x, y);
         limit = limit / x;
+        //edgeLength = edgeLength*n;
     }
 
     function _reset() {
         pencil.clearRect(pos2.x, pos1.y, edgeLength+10, edgeLength+10);
-    };
+    }
+
+    function initPos() {
+
+        pencil.translate(canvas.width/2, canvas.height/2);
+
+        pos1 = {
+            x: 0,
+            y: 0 - edgeLength / 2
+        };
+        pos2 = {
+            x: 0 - edgeLength / 2,
+            y: edgeLength / 2
+        };
+        pos3 = {
+            x: edgeLength / 2,
+            y: edgeLength / 2
+        };
+    }
 
     function initTriangle() {
 
@@ -187,7 +197,7 @@ function Triangle(canvas) {
 
         pencil.stroke();
 
-    };
+    }
 
     return {
         draw: function () {
