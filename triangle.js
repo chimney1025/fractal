@@ -9,15 +9,13 @@ function Triangle(canvas, edgeLength) {
     var pos2;
     var pos3;
 	var scale = 1;
-
     var edgeLength = edgeLength || ((canvas.width<canvas.height)?canvas.width:canvas.height) ;
-
+    var bRect = canvas.getBoundingClientRect();
     var pencil = canvas.getContext("2d");
 
     pencil.translate(canvas.width/2, canvas.height/2);
 	initPos();
 
-    var bRect = canvas.getBoundingClientRect();
     canvas.addEventListener("mousedown", mouseDownListener, false);
     canvas.addEventListener("mousewheel", mouseWheelListener, false);
 	
@@ -49,7 +47,7 @@ function Triangle(canvas, edgeLength) {
 			case 107:
 				_zoom(10);
 				break;
-			case 13:
+			case 109:
 				_zoom(-10);
 				break;
 			default:
