@@ -49,10 +49,12 @@ function Triangle(canvas, edgeLength) {
 
         var moveX = mouseCrtX - mouseX;
         var moveY = mouseCrtY - mouseY;
+		mouseX = mouseCrtX;
+		mouseY = mouseCrtY;
 
         _reset();
         _move(moveX, moveY);
-        initTriangle();
+        drawTriangle(pos1, pos2, pos3, true);
         _draw(pos1, pos2, pos3);
     }
 
@@ -69,12 +71,18 @@ function Triangle(canvas, edgeLength) {
         return edgeLength > limit;
     }
 
-    function drawTriangle(pos1, pos2, pos3) {
+    function drawTriangle(pos1, pos2, pos3, outer) {
         pencil.beginPath();
         pencil.moveTo(pos1.x, pos1.y);
         pencil.lineTo(pos2.x, pos2.y);
         pencil.lineTo(pos3.x, pos3.y);
-        pencil.fill();
+		
+		if(outer) {
+			pencil.closePath();
+			pencil.stroke();
+		} else {
+			pencil.fill();
+		}
     }
 
     function drawTopTriangle(pos1, pos2, pos3) {
@@ -186,26 +194,16 @@ function Triangle(canvas, edgeLength) {
         };
     }
 
-    function initTriangle() {
-        pencil.beginPath();
-        pencil.moveTo(pos1.x, pos1.y);
-        pencil.lineTo(pos2.x, pos2.y);
-        pencil.lineTo(pos3.x, pos3.y);
-        pencil.closePath();
-
-        pencil.stroke();
-    }
-
     return {
         draw: function () {
-            initTriangle();
+            drawTriangle(pos1, pos2, pos3, true);
             _draw(pos1, pos2, pos3);
         },
 
         move: function (x, y) {
             _reset();
             _move(x, y);
-            initTriangle();
+            drawTriangle(pos1, pos2, pos3, true);
             _draw(pos1, pos2, pos3);
 
         },
@@ -213,13 +211,13 @@ function Triangle(canvas, edgeLength) {
         zoom: function (n) {
             _reset();
             _zoom(n);
-            initTriangle();
+            drawTriangle(pos1, pos2, pos3, true);
             _draw(pos1, pos2, pos3);
         },
 
         reset: function() {
             _reset();
-            initTriangle();
+            drawTriangle(pos1, pos2, pos3, true);
             _draw(pos1, pos2, pos3);
         }
     };
