@@ -20,6 +20,8 @@ function Triangle(canvas, edgeLength) {
     var bRect = canvas.getBoundingClientRect();
     canvas.addEventListener("mousedown", mouseDownListener, false);
     canvas.addEventListener("mousewheel", mouseWheelListener, false);
+	
+	window.addEventListener("keydown", keyPressListener);
 
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
@@ -27,6 +29,36 @@ function Triangle(canvas, edgeLength) {
     function checkHit() {
 
     }
+	
+	function keyPressListener(event) {		
+		_reset();
+		
+		switch(event.keyCode){
+			case 38:
+				_move(0, -10);
+				break;
+			case 40:
+				_move(0, 10);
+				break;
+			case 37:
+				_move(-10, 0);
+				break;
+			case 39:
+				_move(10, 0);
+				break;
+			case 107:
+				_zoom(10);
+				break;
+			case 13:
+				_zoom(-10);
+				break;
+			default:
+				break;
+		}
+		
+        drawTriangle(pos1, pos2, pos3, true);
+        _draw(pos1, pos2, pos3);
+	}
 	
 	function mouseWheelListener(event) {
 		var wheel = event.wheelDelta/12;

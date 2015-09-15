@@ -82,7 +82,7 @@ button {
     padding: 8px 26px;
     background-color: #3fb8af;
     cursor: pointer;
-    display: inline-block;
+    display: block;
     margin: 5px 0;
     color: #fff;
     text-transform: uppercase;
