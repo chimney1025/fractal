@@ -1,4 +1,4 @@
-function Triangle(canvas) {
+function Triangle(canvas, edgeLength) {
     var limit = 10;
     var dragging;
     var mouseX;
@@ -9,11 +9,12 @@ function Triangle(canvas) {
     var pos2;
     var pos3;
 
-    var edgeLength = (canvas.width<canvas.height)?canvas.width:canvas.height;
+    var edgeLength = edgeLength || ((canvas.width<canvas.height)?canvas.width:canvas.height) ;
 
     var pencil = canvas.getContext("2d");
 
-    initPos();
+    pencil.translate(canvas.width/2, canvas.height/2);
+	initPos();
 
     var bRect = canvas.getBoundingClientRect();
     canvas.addEventListener("mousedown", mouseDownListener, false);
@@ -159,20 +160,18 @@ function Triangle(canvas) {
         pencil.translate(x, y);
     }
 
-    function _zoom(x, y) {
-        pencil.scale(x, y);
-        limit = limit / x;
-        //edgeLength = edgeLength*n;
+    function _zoom(n) {
+        //pencil.scale(x, y);
+        //limit = limit / x;
+        edgeLength += n;
+		initPos();
     }
 
     function _reset() {
-        pencil.clearRect(pos2.x, pos1.y, edgeLength+10, edgeLength+10);
+        pencil.clearRect(0-canvas.width/2, 0-canvas.height/2, canvas.width/2, canvas.height/2);
     }
 
     function initPos() {
-
-        pencil.translate(canvas.width/2, canvas.height/2);
-
         pos1 = {
             x: 0,
             y: 0 - edgeLength / 2
@@ -188,7 +187,6 @@ function Triangle(canvas) {
     }
 
     function initTriangle() {
-
         pencil.beginPath();
         pencil.moveTo(pos1.x, pos1.y);
         pencil.lineTo(pos2.x, pos2.y);
@@ -196,7 +194,6 @@ function Triangle(canvas) {
         pencil.closePath();
 
         pencil.stroke();
-
     }
 
     return {
@@ -213,9 +210,9 @@ function Triangle(canvas) {
 
         },
 
-        zoom: function (x, y) {
+        zoom: function (n) {
             _reset();
-            _zoom(x, y);
+            _zoom(n);
             initTriangle();
             _draw(pos1, pos2, pos3);
         },

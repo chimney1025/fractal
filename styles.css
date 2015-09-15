@@ -19,9 +19,6 @@ body {
     z-index: 1;
     text-align: center;
 }
-.panning {
-    margin: 5px 0;
-}
 button {
     border: 0 none;
     font-size: 13px;
@@ -36,14 +33,18 @@ button {
 
 button:hover{
     background-color: #32928b;
-    border-color: #297772;
 }
 
-button#reset {
+button.reset {
     background-color: #e7746f;
 }
 
-button#reset:hover {
+button.reset:hover {
     background-color: #e04a43;
-    border-color: #db2c25;
+}
+button.zoom {
+	background-color: #d2d2d2;
+}
+button.zoom:hover {
+	background-color: #e7e7e7;
 }

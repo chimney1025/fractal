@@ -9,36 +9,30 @@
 <body>
 <div id="config">
     <div>
-        <button id="zoomIn">Zoom In + </button>
-        <button id="zoomOut">Zoom Out - </button>
-    </div>
-    <div class="panning">
+        <button class="zoom" id="zoomIn">Zoom In + </button>
+        <button class="zoom" id="zoomOut">Zoom Out - </button>
         <button id="moveUp">Up</button>
-        <br>
         <button id="moveLeft">Left</button>
         <button id="moveRight">Right</button>
-        <br>
         <button id="moveDown">Down</button>
-    </div>
-    <div>
-        <button id="reset">Reset</button>
+        <button class="reset" id="reset">Reset</button>
     </div>
 </div>
-<canvas id="canvas" width="800" height="500"></canvas>
+<canvas id="canvas" width="400" height="200"></canvas>
 
 
 <script src="triangle.js"></script>
 <script>
     var canvas = document.getElementById("canvas");
-    var triangle = new Triangle(canvas);
+    var triangle = new Triangle(canvas, 101);
     triangle.draw();
 
     document.getElementById("zoomIn").addEventListener("click", function(){
-        triangle.zoom(1.1, 1.1);
+        triangle.zoom(10);
     });
 
     document.getElementById("zoomOut").addEventListener("click", function(){
-        triangle.zoom(0.9, 0.9);
+        triangle.zoom(-10);
     });
 
     document.getElementById("moveLeft").addEventListener("click", function(){
