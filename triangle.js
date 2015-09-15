@@ -1,71 +1,71 @@
 function Listener() {
-	
-	function _checkBrowser() {
-		if(navigator.userAgent.indexOf("Firefox") != -1) {
-			return "firefox";
-		}
-	}
-	
-	function _add(element, eventName, listener) {
-		if(element.attachEvent) {
-			
-			element.attachEvent("on" + eventName, listener);
-			
-		} else if(element.addEventListener) {
-			
-			element.addEventListener(eventName, listener, false);
-			
-		}
-	}
-	
-	function _remove(element, eventName, listener) {
-		if(element.detachEvent) {
-			
-			element.detachEvent("on" + eventName, listener);
-			
-		} else if(element.removeEventListener) {
-			
-			element.removeEventListener(eventName, listener, false);
-			
-		}
-	}
-	
-	function _addMouseWheel(element, listener) {
-		if(element.attachEvent) {
-			
-			element.attachEvent("onmousewheel", function(event){
-				return listener(event.wheelDelta/12);
-			});
-			
-		} else if(element.addEventListener) {
-			
-			if(_checkBrowser() == "firefox") {
-				element.addEventListener("DOMMouseScroll", function(event){
-					return listener(0 - event.detail*20/3, event.clientX, event.clientY);
-				}, false);
-			} else {
-				element.addEventListener("mousewheel", function(event){
-					return listener(event.wheelDelta/6, event.clientX, event.clientY);
-				}, false);
-			}
-			
-		}
-	}
-	
-	return {
-		add: function(element, eventName, listener) {
-			if(eventName == "mousewheel") {
-				_addMouseWheel(element, listener);
-			} else {
-				_add(element, eventName, listener);
-			}
-		},
-		
-		remove: function(element, eventName, listener) {
-			_remove(element, eventName, listener);
-			
-		}
-	}
+
+    function _checkBrowser() {
+        if(navigator.userAgent.indexOf("Firefox") != -1) {
+            return "firefox";
+        }
+    }
+
+    function _add(element, eventName, listener) {
+        if(element.attachEvent) {
+
+            element.attachEvent("on" + eventName, listener);
+
+        } else if(element.addEventListener) {
+
+            element.addEventListener(eventName, listener, false);
+
+        }
+    }
+
+    function _remove(element, eventName, listener) {
+        if(element.detachEvent) {
+
+            element.detachEvent("on" + eventName, listener);
+
+        } else if(element.removeEventListener) {
+
+            element.removeEventListener(eventName, listener, false);
+
+        }
+    }
+
+    function _addMouseWheel(element, listener) {
+        if(element.attachEvent) {
+
+            element.attachEvent("onmousewheel", function(event){
+                return listener(event.wheelDelta/12);
+            });
+
+        } else if(element.addEventListener) {
+
+            if(_checkBrowser() == "firefox") {
+                element.addEventListener("DOMMouseScroll", function(event){
+                    return listener(0 - event.detail*20/3, event.clientX, event.clientY);
+                }, false);
+            } else {
+                element.addEventListener("mousewheel", function(event){
+                    return listener(event.wheelDelta/6, event.clientX, event.clientY);
+                }, false);
+            }
+
+        }
+    }
+
+    return {
+        add: function(element, eventName, listener) {
+            if(eventName == "mousewheel") {
+                _addMouseWheel(element, listener);
+            } else {
+                _add(element, eventName, listener);
+            }
+        },
+
+        remove: function(element, eventName, listener) {
+            _remove(element, eventName, listener);
+
+        }
+    }
 }
 
 function Triangle(canvas, edgeLength) {
@@ -76,75 +76,75 @@ function Triangle(canvas, edgeLength) {
     var pos1;
     var pos2;
     var pos3;
-	var scale = 1;
+    var scale = 1;
     var edgeLength = edgeLength || ((canvas.width<canvas.height)?canvas.width:canvas.height) ;
     var bRect = canvas.getBoundingClientRect();
     var pencil = canvas.getContext("2d");
-	var listener = new Listener();
+    var listener = new Listener();
 
     pencil.translate(canvas.width/2, canvas.height/2);
-	initPos();
-	
-	listener.add(canvas, "mousedown", mouseDownListener);
-	listener.add(canvas, "mousewheel", mouseWheelListener);
-	listener.add(window, "keydown", keyPressListener);
-	
+    initPos();
+
+    listener.add(canvas, "mousedown", mouseDownListener);
+    listener.add(canvas, "mousewheel", mouseWheelListener);
+    listener.add(window, "keydown", keyPressListener);
+
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
-	
-	function keyPressListener(event) {		
-		_reset();
-		
-		switch(event.keyCode){
-			case 38:
-				_move(0, -10);
-				break;
-			case 40:
-				_move(0, 10);
-				break;
-			case 37:
-				_move(-10, 0);
-				break;
-			case 39:
-				_move(10, 0);
-				break;
-			case 107:
-				_zoom(10);
-				break;
-			case 109:
-				_zoom(-10);
-				break;
-			default:
-				break;
-		}
-		
+
+    function keyPressListener(event) {
+        _reset();
+
+        switch(event.keyCode){
+            case 38:
+                _move(0, -10);
+                break;
+            case 40:
+                _move(0, 10);
+                break;
+            case 37:
+                _move(-10, 0);
+                break;
+            case 39:
+                _move(10, 0);
+                break;
+            case 107:
+                _zoom(10);
+                break;
+            case 109:
+                _zoom(-10);
+                break;
+            default:
+                break;
+        }
+
         drawTriangle(pos1, pos2, pos3, true);
         _draw(pos1, pos2, pos3);
-	}
-	
-	function mouseWheelListener(level, posX, posY) {		
-		_reset();
+    }
+
+    function mouseWheelListener(level, posX, posY) {
+        _reset();
         _zoom(level);
         drawTriangle(pos1, pos2, pos3, true);
         _draw(pos1, pos2, pos3);
-	}
+    }
 
     function mouseDownListener(event) {
         mouseX = (event.clientX - bRect.left)*(canvas.width/bRect.width);
         mouseY = (event.clientY - bRect.top)*(canvas.height/bRect.height);
 
         dragging = true;
-		
-		listener.add(window, "mousemove", mouseMoveListener);
-		listener.remove(canvas, "mousedown", mouseDownListener);
-		listener.add(window, "mouseup", mouseUpListener);
+
+        listener.add(window, "mousemove", mouseMoveListener);
+        listener.remove(canvas, "mousedown", mouseDownListener);
+        listener.add(window, "mouseup", mouseUpListener);
 
         if (event.preventDefault) {
             event.preventDefault();
         } else if (event.returnValue) {
             event.returnValue = false;
         }
-		
+
         return false;
     }
 
@@ -154,8 +154,8 @@ function Triangle(canvas, edgeLength) {
 
         var moveX = mouseCrtX - mouseX;
         var moveY = mouseCrtY - mouseY;
-		mouseX = mouseCrtX;
-		mouseY = mouseCrtY;
+        mouseX = mouseCrtX;
+        mouseY = mouseCrtY;
 
         _reset();
         _move(moveX, moveY);
@@ -164,12 +164,12 @@ function Triangle(canvas, edgeLength) {
     }
 
     function mouseUpListener(event) {
-		listener.add(canvas, "mousedown", mouseDownListener);
-		listener.remove(window, "mouseup", mouseUpListener);
-		
+        listener.add(canvas, "mousedown", mouseDownListener);
+        listener.remove(window, "mouseup", mouseUpListener);
+
         if (dragging) {
             dragging = false;
-			listener.remove(window, "mousemove", mouseMoveListener);
+            listener.remove(window, "mousemove", mouseMoveListener);
         }
     }
 
@@ -182,13 +182,13 @@ function Triangle(canvas, edgeLength) {
         pencil.moveTo(pos1.x, pos1.y);
         pencil.lineTo(pos2.x, pos2.y);
         pencil.lineTo(pos3.x, pos3.y);
-		
-		if(outer) {
-			pencil.closePath();
-			pencil.stroke();
-		} else {
-			pencil.fill();
-		}
+
+        if(outer) {
+            pencil.closePath();
+            pencil.stroke();
+        } else {
+            pencil.fill();
+        }
     }
 
     function drawTopTriangle(pos1, pos2, pos3) {
@@ -275,25 +275,25 @@ function Triangle(canvas, edgeLength) {
     }
 
     function _zoom(n) {
-		if( (n < 0 && checkLimit(edgeLength + n/scale) ) || n>0 ) {
-			edgeLength += n/scale;
-			initPos();
-		}
+        if( (n < 0 && checkLimit(edgeLength + n/scale) ) || n>0 ) {
+            edgeLength += n/scale;
+            initPos();
+        }
     }
-	
-	function _scale(n) {
-		scale *= n;
-		if( (n < 1 && limit < 100) || n > 1) {
-			pencil.scale(n, n);
-			limit = limit / n;
-		}
-	}
+
+    function _scale(n) {
+        scale *= n;
+        if( (n < 1 && limit < 100) || n > 1) {
+            pencil.scale(n, n);
+            limit = limit / n;
+        }
+    }
 
     function _reset() {
         //pencil.clearRect(0-canvas.width/2, 0-canvas.height/2, canvas.width, canvas.height);
-		//pencil.clearRect(pos2.x-10, pos1.y-10, (pos3.x - pos2.x + 10), (pos3.y - pos1.y + 10));
-		//set a larger area as otherwise the 'border' will be left
-		pencil.clearRect(0-edgeLength, 0-edgeLength, edgeLength*2, edgeLength*2);
+        //pencil.clearRect(pos2.x-10, pos1.y-10, (pos3.x - pos2.x + 10), (pos3.y - pos1.y + 10));
+        //set a larger area as otherwise the 'border' will be left
+        pencil.clearRect(0-edgeLength, 0-edgeLength, edgeLength*2, edgeLength*2);
     }
 
     function initPos() {
