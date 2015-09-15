@@ -41,11 +41,11 @@ function Listener() {
 			
 			if(_checkBrowser() == "firefox") {
 				element.addEventListener("DOMMouseScroll", function(event){
-					return listener(0 - event.detail*10/3);
+					return listener(0 - event.detail*20/3, event.clientX, event.clientY);
 				}, false);
 			} else {
 				element.addEventListener("mousewheel", function(event){
-					return listener(event.wheelDelta/12);
+					return listener(event.wheelDelta/6, event.clientX, event.clientY);
 				}, false);
 			}
 			
@@ -122,7 +122,7 @@ function Triangle(canvas, edgeLength) {
         _draw(pos1, pos2, pos3);
 	}
 	
-	function mouseWheelListener(level) {		
+	function mouseWheelListener(level, posX, posY) {		
 		_reset();
         _zoom(level);
         drawTriangle(pos1, pos2, pos3, true);
