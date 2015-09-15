@@ -168,7 +168,7 @@ function Triangle(canvas, edgeLength) {
     }
 
     function _reset() {
-        pencil.clearRect(0-canvas.width/2, 0-canvas.height/2, canvas.width/2, canvas.height/2);
+        pencil.clearRect(0-canvas.width/2, 0-canvas.height/2, canvas.width, canvas.height);
     }
 
     function initPos() {
