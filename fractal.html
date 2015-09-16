@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Sierpinski Triangle</title>
 
@@ -7,54 +8,55 @@
 </head>
 
 <body>
-<div id="config">
-    <div class="control">
-        <div title="Zoom in">
-            <div>
-                <img id="zoomIn" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
+    <div id="config">
+        <div class="control">
+            <div title="Zoom in">
+                <div>
+                    <img id="zoomIn" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
+                </div>
+            </div>
+            <div title="Zoom out" id="zoomOut">
+                <div>
+                    <img id="zoomOut" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
+                </div>
             </div>
         </div>
-        <div title="Zoom out" id="zoomOut">
-            <div>
-                <img id="zoomOut" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
-            </div>
-        </div>
-    </div>
-    <!--
+        <!--
     <button class="zoom" id="scaleIn">Scale In + </button>
     <button class="zoom" id="scaleOut">Scale Out - </button>
     -->
-</div>
+    </div>
 
-<canvas id="canvas" width="800" height="400"></canvas>
+    <canvas id="canvas" width="800" height="400"></canvas>
 
 
-<script src="triangle.js"></script>
-<script>
-    var canvas = document.getElementById("canvas");
-    var triangle = new Triangle(canvas);
-    triangle.draw(100);
+    <script src="triangle.js"></script>
+    <script>
+        var canvas = document.getElementById("canvas");
+        var triangle = new Triangle(canvas);
+        triangle.draw(100);
 
-    document.getElementById("zoomIn").addEventListener("click", function(){
-        triangle.zoom(10);
-		//triangle.move(0, -10);
-    });
+        document.getElementById("zoomIn").addEventListener("click", function() {
+            triangle.zoom(10);
+            //triangle.move(0, -10);
+        });
 
-    document.getElementById("zoomOut").addEventListener("click", function(){
-        triangle.zoom(-10);
-		//triangle.move(0, 10);
-    });
+        document.getElementById("zoomOut").addEventListener("click", function() {
+            triangle.zoom(-10);
+            //triangle.move(0, 10);
+        });
 
-	/*
-    document.getElementById("scaleIn").addEventListener("click", function(){
+        /*
+        document.getElementById("scaleIn").addEventListener("click", function(){
         triangle.scale(1.25);
-    });
+        });
 
-    document.getElementById("scaleOut").addEventListener("click", function(){
+        document.getElementById("scaleOut").addEventListener("click", function(){
         triangle.scale(0.8);
-    });
-	*/
-</script>
+        });
+	    */
+    </script>
 
 </body>
+
 </html>
