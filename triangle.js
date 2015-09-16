@@ -1,30 +1,5 @@
-function Canvas(){
-    SIDE_LENGTH = 100;
-    ZOOM_LEVEL = 10;
-    MIN_SIDE_LENGTH = 10;
-
-    var canvas = document.getElementById("canvas");
-    canvas.width = window.innerWidth -100;
-    canvas.height = window.innerHeight -100;
-
-    this.drawSierpinski = function(){
-        var triangle = new Triangle(canvas);
-        new Listener(canvas, triangle);
-        triangle.draw(SIDE_LENGTH);
-
-        document.getElementById("zoomIn").addEventListener("click", function() {
-            triangle.zoom(ZOOM_LEVEL);
-            //triangle.move(0, -10);
-        });
-
-        document.getElementById("zoomOut").addEventListener("click", function() {
-            triangle.zoom(0-ZOOM_LEVEL);
-            //triangle.move(0, 10);
-        });
-    }
-}
-
 function Triangle(canvas) {
+    var MIN_SIDE_LENGTH = 10;
     var sideLength = (canvas.width < canvas.height) ? canvas.width : canvas.height;
     var pencil = canvas.getContext("2d");
     pencil.translate(canvas.width / 2, canvas.height / 2);
@@ -32,17 +7,21 @@ function Triangle(canvas) {
     pencil.fillStyle = "#e7746f";
     var shape;
 
-    this.draw = function(sideLength) {
+    this.draw = function (sideLength) {
         _draw(sideLength);
     };
 
-    this.move = function(x, y) {
+    this.move = function (x, y) {
         _move(x, y);
     };
 
-    this.zoom = function(n) {
+    this.zoom = function (n) {
         _zoom(n);
     };
+
+    this.getCanvas = function() {
+        return canvas;
+    }
 
 
     function _clear() {
@@ -214,18 +193,15 @@ function Triangle(canvas) {
             }
         };
 
-        this.draw = function(shapeOption) {
+        this.draw = function (shapeOption) {
             _draw(shapeOption);
         }
     }
 }
 
 
-
-function Listener(canvas, element) {
-    var boundary = canvas.getBoundingClientRect();
-    var dragging, mouseX, mouseY;
-    _init();
+function TriangleController() {
+    var canvas, boundary, dragging, mouseX, mouseY;
 
     function _checkBrowser() {
         if (navigator.userAgent.indexOf("Firefox") != -1) {
@@ -251,17 +227,17 @@ function Listener(canvas, element) {
 
     function _addMouseWheel(element, listener) {
         if (element.attachEvent) {
-            element.attachEvent("onmousewheel", function(event) {
+            element.attachEvent("onmousewheel", function (event) {
                 return listener(event.wheelDelta / 12);
             });
         } else if (element.addEventListener) {
 
             if (_checkBrowser() == "firefox") {
-                element.addEventListener("DOMMouseScroll", function(event) {
+                element.addEventListener("DOMMouseScroll", function (event) {
                     return listener(0 - event.detail * 20 / 3, event.clientX, event.clientY);
                 }, false);
             } else {
-                element.addEventListener("mousewheel", function(event) {
+                element.addEventListener("mousewheel", function (event) {
                     return listener(event.wheelDelta / 6, event.clientX, event.clientY);
                 }, false);
             }
@@ -295,7 +271,7 @@ function Listener(canvas, element) {
         mouseX = mouseCrtX;
         mouseY = mouseCrtY;
 
-        element.move(moveX, moveY);
+        triangle.move(moveX, moveY);
     }
 
     function _mouseUpListener(event) {
@@ -309,35 +285,38 @@ function Listener(canvas, element) {
     }
 
     function _mouseWheelListener(level) {
-        element.zoom(level);
+        triangle.zoom(level);
     }
 
     function _keyDownListener(event) {
         switch (event.keyCode) {
             case 38:
-                element.move(0, -10);
+                triangle.move(0, -10);
                 break;
             case 40:
-                element.move(0, 10);
+                triangle.move(0, 10);
                 break;
             case 37:
-                element.move(-10, 0);
+                triangle.move(-10, 0);
                 break;
             case 39:
-                element.move(10, 0);
+                triangle.move(10, 0);
                 break;
             case 107:
-                element.zoom(10);
+                triangle.zoom(10);
                 break;
             case 109:
-                element.zoom(-10);
+                triangle.zoom(-10);
                 break;
             default:
                 break;
         }
     }
 
-    function _init() {
+    this.bind = function(triangle) {
+        canvas = triangle.getCanvas();
+        boundary = canvas.getBoundingClientRect();
+
         _add(canvas, "mousedown", _mouseDownListener);
         _addMouseWheel(canvas, _mouseWheelListener)
         _add(window, "keydown", _keyDownListener);

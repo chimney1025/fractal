@@ -32,14 +32,26 @@
     <script src="triangle.js"></script>
     <script>
 
-        var canvas = new Canvas();
-        canvas.drawSierpinski();
+        var canvas = document.getElementById("canvas");
+        var CANVAS_MARGIN = 100;
+        var SIDE_LENGTH = 100;
+        var ZOOM_LEVEL = 10;
 
+        canvas.width = window.innerWidth - CANVAS_MARGIN;
+        canvas.height = window.innerHeight - CANVAS_MARGIN;
 
-        window.onresize = function(){
-            canvas = new Canvas();
-            canvas.drawSierpinski();
-        };
+        var triangle = new Triangle(canvas);
+        var controller = new TriangleController();
+        controller.bind(triangle);
+        triangle.draw(SIDE_LENGTH);
+
+        document.getElementById("zoomIn").addEventListener("click", function () {
+            triangle.zoom(ZOOM_LEVEL);
+        });
+
+        document.getElementById("zoomOut").addEventListener("click", function () {
+            triangle.zoom(0 - ZOOM_LEVEL);
+        });
 
     </script>
 
