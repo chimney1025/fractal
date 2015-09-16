@@ -1,392 +1,323 @@
-/*
- * Canvas responsibilities:
- *
- * initial triangle
- * draw triangle
- * move triangle
- * zoom triangle
- * add mouse listener
- * add key listener
- *
- * Triangle responsibilities:
- *
- * draw shape
- * translate shape
- *
- * Listener responsibilities:
- *
- * when mouse down - update mouse position
- * when mouse move - move triangle
- * when mouse up - stop moving triangle
- * when mouse scroll - zoom triangle
- * */
+function Triangle(canvas) {
+  var sideLength = (canvas.width < canvas.height) ? canvas.width : canvas.height;
+  var boundry = canvas.getBoundingClientRect();
+  var pencil = canvas.getContext("2d");
+  pencil.translate(canvas.width/2, canvas.height/2);
+  pencil.strokeStyle = "#e7746f";
+  pencil.fillStyle = "#e7746f";
+  var limit = 10;
+  var dragging, mouseX, mouseY;
+  var shape;
+  var listener = new Listener();
+  listener.init();
+  
+  this.draw = function (sideLength) {
+	_draw(sideLength);
+  };
+	  
+  this.move = function (x, y) {
+	_move(x, y);
+  };
 
-function Canvas(canvas, pLength) {
-    var limit = 10,
-        scale = 1,
-        pencil,
-        trianglePos,
-        bRect,
-        dragging,
-        edgeLength;
+  this.zoom = function (n) {
+	_zoom(n);
+  };
+  
+  
+  function _clear() {
+	  pencil.clearRect(0-sideLength, 0-sideLength, sideLength*2, sideLength*2);
+  }
+  
+  function _checkLimit(option) {
+	  return ( (option.pos3.x - option.pos2.x) > limit );
+  }
+  
+  function _calculate(option) {	  
+	  if(_checkLimit(option)){
+		_calculateInner(option);
+		_calculateTop(option);
+		_calculateLeft(option);
+		_calculateRight(option);
+	  }
+  }
+  
+  function _calculateInner(option) {
+	  var option = {
+		  pos1: {
+			  x: (option.pos1.x + option.pos2.x)/2,
+			  y: (option.pos1.y + option.pos2.y)/2
+		  },
+		  pos2: {
+			  x: (option.pos1.x + option.pos3.x)/2,
+			  y: (option.pos1.y + option.pos3.y)/2
+		  },
+		  pos3: {
+			  x: (option.pos2.x + option.pos3.x)/2,
+			  y: (option.pos2.y + option.pos3.y)/2
+		  },
+		  style: "fill"
+	  };
+	  
+	  shape.draw(option);
+  }
+  
+  function _calculateTop(option) {
+	  var option = {
+		  pos1: {
+			  x: option.pos1.x,
+			  y: option.pos1.y
+		  },
+		  pos2: {
+			  x: (option.pos1.x + option.pos2.x)/2,
+			  y: (option.pos1.y + option.pos2.y)/2
+		  },
+		  pos3: {
+			  x: (option.pos1.x + option.pos3.x)/2,
+			  y: (option.pos1.y + option.pos3.y)/2
+		  },
+		  style: "fill"
+	  };
+	  
+	  _calculate(option);
+  }
+  
+  function _calculateLeft(option) {
+	  var option = {
+		  pos1: {
+			  x: (option.pos1.x + option.pos2.x)/2,
+			  y: (option.pos1.y + option.pos2.y)/2
+		  },
+		  pos2: {
+			  x: option.pos2.x,
+			  y: option.pos2.y
+		  },
+		  pos3: {
+			  x: (option.pos2.x + option.pos3.x)/2,
+			  y: (option.pos2.y + option.pos3.y)/2
+		  },
+		  style: "fill"
+	  };
+	  
+	  _calculate(option);
+  }
+  
+  function _calculateRight(option) {
+	  var option = {
+		  pos1: {
+			  x: (option.pos1.x + option.pos3.x)/2,
+			  y: (option.pos1.y + option.pos3.y)/2
+		  },
+		  pos2: {
+			  x: (option.pos2.x + option.pos3.x)/2,
+			  y: (option.pos2.y + option.pos3.y)/2
+		  },
+		  pos3: {
+			  x: option.pos3.x,
+			  y: option.pos3.y
+		  },
+		  style: "fill"
+	  };
+	  
+	  _calculate(option);
+  }
+  
+  function _draw(newLength) {
+	  sideLength = newLength || sideLength;
+	  shape = new Shape();
+	  
+	  var outer_option = {
+		  pos1 : {
+            x: 0,
+            y: 0 - sideLength / 2
+		  },
+		  pos2 : {
+            x: 0 - sideLength / 2,
+            y: sideLength / 2
+          },
+          pos3 : {
+            x: sideLength / 2,
+            y: sideLength / 2
+          },
+		  style: "stroke"
+	  };
+	  
+	  shape.draw(outer_option);
+	  
+	  var inner_option = {
+		  pos1 : {
+            x: 0,
+            y: 0 - sideLength / 2
+		  },
+		  pos2 : {
+            x: 0 - sideLength / 2,
+            y: sideLength / 2
+          },
+          pos3 : {
+            x: sideLength / 2,
+            y: sideLength / 2
+          },
+		  style: "fill"
+	  };
+	  
+	  _calculate(inner_option);
+  }
+  
+  function _move(x, y) {
+	  _clear();
+	  pencil.translate(x, y);
+	  _draw(sideLength);
+  }
+  
+  function _zoom(n) {
+	  if( n>0 || sideLength > limit){
+		_clear();
+	    sideLength += n;
+	    _draw(sideLength);
+	  }
+  }
 
-    initPosition(pLength);
-    var triangle = new Triangle();
-    var listener = new Listener();
-    listener.init(canvas, triangle);
-
-    function initPosition(pLength) {
-        pencil = canvas.getContext("2d");
-        pencil.strokeStyle = "#e7746f";
-        pencil.fillStyle = "#e7746f";
-        pencil.translate(canvas.width/2, canvas.height/2);
-
-        trianglePos = {
-            pos1: {
-                x: 0,
-                y: 0 - edgeLength / 2
-            },
-            pos2: {
-                x: 0 - edgeLength / 2,
-                y: edgeLength / 2
-            },
-            pos3 : {
-                x: edgeLength / 2,
-                y: edgeLength / 2
-            }
-        };
-
-        bRect = canvas.getBoundingClientRect();
-
-        edgeLength = pLength || ((canvas.width<canvas.height)?canvas.width:canvas.height);
+  function Shape() {
+	  function _draw(option) {
+		pencil.beginPath();
+		pencil.moveTo(option.pos1.x, option.pos1.y);
+		pencil.lineTo(option.pos2.x, option.pos2.y);
+		pencil.lineTo(option.pos3.x, option.pos3.y);
+		
+		if(option.style == "stroke") {
+			pencil.closePath();
+			pencil.stroke();
+		}
+		
+		if(option.style == "fill") {
+			pencil.fill();
+		}
+	  };
+	  
+	  this.draw = function(option) {
+		_draw(option);
+	  }
+  }
+  
+  function Listener() {
+	function _checkBrowser() {
+        if(navigator.userAgent.indexOf("Firefox") != -1) {
+            return "firefox";
+        }
     }
 
-    function Listener() {
-
-        function _checkBrowser() {
-            if(navigator.userAgent.indexOf("Firefox") != -1) {
-                return "firefox";
-            }
-        }
-
-        function _add(element, eventName, listener) {
-            if(element.attachEvent) {
-
-                element.attachEvent("on" + eventName, listener);
-
-            } else if(element.addEventListener) {
-
-                element.addEventListener(eventName, listener, false);
-
-            }
-        }
-
-        function _remove(element, eventName, listener) {
-            if(element.detachEvent) {
-
-                element.detachEvent("on" + eventName, listener);
-
-            } else if(element.removeEventListener) {
-
-                element.removeEventListener(eventName, listener, false);
-
-            }
-        }
-
-        function _addMouseWheel(element, listener) {
-            if(element.attachEvent) {
-
-                element.attachEvent("onmousewheel", function(event){
-                    return listener(event.wheelDelta/12);
-                });
-
-            } else if(element.addEventListener) {
-
-                if(_checkBrowser() == "firefox") {
-                    element.addEventListener("DOMMouseScroll", function(event){
-                        return listener(0 - event.detail*20/3, event.clientX, event.clientY);
-                    }, false);
-                } else {
-                    element.addEventListener("mousewheel", function(event){
-                        return listener(event.wheelDelta/6, event.clientX, event.clientY);
-                    }, false);
-                }
-
-            }
-        }
-
-        function keyPressListener(event) {
-            _reset();
-
-            switch(event.keyCode){
-                case 38:
-                    _move(0, -10);
-                    break;
-                case 40:
-                    _move(0, 10);
-                    break;
-                case 37:
-                    _move(-10, 0);
-                    break;
-                case 39:
-                    _move(10, 0);
-                    break;
-                case 107:
-                    _zoom(10);
-                    break;
-                case 109:
-                    _zoom(-10);
-                    break;
-                default:
-                    break;
-            }
-
-            drawTriangle(pos1, pos2, pos3, true);
-            _calculate(pos1, pos2, pos3);
-        }
-
-        function mouseWheelListener(level, posX, posY) {
-            _reset();
-            _zoom(level);
-            drawTriangle(pos1, pos2, pos3, true);
-            _calculate(pos1, pos2, pos3);
-        }
-
-        function mouseDownListener(event) {
-            mouseX = (event.clientX - bRect.left)*(canvas.width/bRect.width);
-            mouseY = (event.clientY - bRect.top)*(canvas.height/bRect.height);
-
-            dragging = true;
-
-            listener.add(window, "mousemove", mouseMoveListener);
-            listener.remove(canvas, "mousedown", mouseDownListener);
-            listener.add(window, "mouseup", mouseUpListener);
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else if (event.returnValue) {
-                event.returnValue = false;
-            }
-
-            return false;
-        }
-
-        function mouseMoveListener(event) {
-            var mouseCrtX = (event.clientX - bRect.left)*(canvas.width/bRect.width);
-            var mouseCrtY = (event.clientY - bRect.top)*(canvas.height/bRect.height);
-
-            var moveX = mouseCrtX - mouseX;
-            var moveY = mouseCrtY - mouseY;
-            mouseX = mouseCrtX;
-            mouseY = mouseCrtY;
-
-            _reset();
-            _move(moveX, moveY);
-            drawTriangle(pos1, pos2, pos3, true);
-            _calculate(pos1, pos2, pos3);
-        }
-
-        function mouseUpListener(event) {
-            listener.add(canvas, "mousedown", mouseDownListener);
-            listener.remove(window, "mouseup", mouseUpListener);
-
-            if (dragging) {
-                dragging = false;
-                listener.remove(window, "mousemove", mouseMoveListener);
-            }
-        }
-
-        return {
-            init: function(element, actor){
-                
-            }
+    function _add(element, eventName, listener) {
+        if(element.attachEvent) {
+            element.attachEvent("on" + eventName, listener);
+        } else if(element.addEventListener) {
+            element.addEventListener(eventName, listener, false);
         }
     }
 
-    function Triangle() {
-
-        function checkLimit(edgeLength) {
-            return edgeLength > limit;
+    function _remove(element, eventName, listener) {
+        if(element.detachEvent) {
+            element.detachEvent("on" + eventName, listener);
+        } else if(element.removeEventListener) {
+            element.removeEventListener(eventName, listener, false);
         }
-
-        function drawOuterTriangle(trianglePos) {
-            pencil.moveTo(trianglePos.pos1.x, trianglePos.pos1.y);
-            pencil.lineTo(trianglePos.pos2.x, trianglePos.pos2.y);
-            pencil.lineTo(trianglePos.pos3.x, trianglePos.pos3.y);
-            pencil.closePath();
-            pencil.stroke();
-        }
-
-
-
-        function drawInnerTriangle(trianglePos) {
-            pencil.moveTo(trianglePos.pos1.x, trianglePos.pos1.y);
-            pencil.lineTo(trianglePos.pos2.x, trianglePos.pos2.y);
-            pencil.lineTo(trianglePos.pos3.x, trianglePos.pos3.y);
-            pencil.fill();
-        }
-
-        function calculateTopTriangle(pos1, pos2, pos3) {
-            var p1 = {
-                x: trianglePos.pos1.x,
-                y: trianglePos.pos1.y
-            };
-            var p2 = {
-                x: (trianglePos.pos1.x + trianglePos.pos2.x) / 2,
-                y: (trianglePos.pos1.y + trianglePos.pos2.y) / 2
-            };
-            var p3 = {
-                x: (trianglePos.pos1.x + trianglePos.pos3.x) / 2,
-                y: (trianglePos.pos1.y + trianglePos.pos3.y) / 2
-            };
-
-            _calculate({
-                pos1: p1,
-                pos2: p2,
-                pos3: p3
-            });
-        }
-
-        function calculateLeftTriangle(pos1, pos2, pos3) {
-            var p1 = {
-                x: (pos1.x + pos2.x) / 2,
-                y: (pos1.y + pos2.y) / 2
-            };
-            var p2 = {
-                x: pos2.x,
-                y: pos2.y
-            };
-            var p3 = {
-                x: (pos2.x + pos3.x) / 2,
-                y: (pos2.y + pos3.y) / 2
-            };
-
-            _calculate({
-                pos1: p1,
-                pos2: p2,
-                pos3: p3
-            });
-        }
-
-        function calculateRightTriangle(trianglePos) {
-            var p1 = {
-                x: (trianglePos.pos1.x + trianglePos.pos3.x) / 2,
-                y: (trianglePos.pos1.y + trianglePos.pos3.y) / 2
-            };
-            var p2 = {
-                x: (trianglePos.pos2.x + trianglePos.pos3.x) / 2,
-                y: (trianglePos.pos2.y + trianglePos.pos3.y) / 2
-            };
-            var p3 = {
-                x: trianglePos.pos3.x,
-                y: trianglePos.pos3.y
-            };
-
-            _calculate({
-                pos1: p1,
-                pos2: p2,
-                pos3: p3
-            });
-        }
-
-        function calculateInnerTriangle(trianglePos) {
-            var p1 = {
-                x: (trianglePos.pos1.x + trianglePos.pos2.x) / 2,
-                y: (trianglePos.pos1.y + trianglePos.pos2.y) / 2
-            };
-
-            var p2 = {
-                x: (trianglePos.pos1.x + trianglePos.pos3.x) / 2,
-                y: (trianglePos.pos1.y + trianglePos.pos3.y) / 2
-            };
-
-            var p3 = {
-                x: (trianglePos.pos2.x + trianglePos.pos3.x) / 2,
-                y: (trianglePos.pos2.y + trianglePos.pos3.y) / 2
-            };
-
-            drawInnerTriangle({
-                pos1: p1,
-                pos2: p2,
-                pos3: p3
-            });
-        }
-
-        function _calculate(trianglePos) {
-            if (checkLimit(trianglePos.pos3.x - trianglePos.pos2.x)) {
-                calculateInnerTriangle(trianglePos);
-                calculateTopTriangle(trianglePos);
-                calculateLeftTriangle(trianglePos);
-                calculateRightTriangle(trianglePos);
-            }
-        }
-
-        function _move(x, y) {
-            pencil.translate(x/scale, y/scale);
-            drawOuterTriangle(trianglePos);
-            _calculate(trianglePos);
-        }
-
-        function _zoom(n) {
-            if( (n < 0 && checkLimit(edgeLength + n/scale) ) || n>0 ) {
-                edgeLength += n/scale;
-                initPos();
-                drawOuterTriangle(trianglePos);
-                _calculate(trianglePos);
-            }
-        }
-
-        function _scale(n) {
-            scale *= n;
-            if( (n < 1 && limit < 100) || n > 1) {
-                pencil.scale(n, n);
-                limit = limit / n;
-                drawOuterTriangle(trianglePos);
-                _calculate(trianglePos);
-            }
-        }
-
-        function _reset() {
-            //pencil.clearRect(0-canvas.width/2, 0-canvas.height/2, canvas.width, canvas.height);
-            //pencil.clearRect(pos2.x-10, pos1.y-10, (pos3.x - pos2.x + 10), (pos3.y - pos1.y + 10));
-            //set a larger area as otherwise the 'border' will be left
-            pencil.clearRect(0-edgeLength, 0-edgeLength, edgeLength*2, edgeLength*2);
-        }
-
-        return {
-            draw: function (trianglePos) {
-                drawOuterTriangle(trianglePos);
-                _calculate(trianglePos);
-            },
-
-            move: function (x, y) {
-                _reset();
-                _move(x, y);
-
-            },
-
-            zoom: function (n) {
-                _reset();
-                _zoom(n);
-            }
-        };
     }
+	
+	function _addMouseWheel(element, listener) {
+        if(element.attachEvent) {
+            element.attachEvent("onmousewheel", function(event){
+                return listener(event.wheelDelta/12);
+            });
+        } else if(element.addEventListener) {
 
-    return {
-        draw: function () {
-            drawOuterTriangle(pos1, pos2, pos3);
-            _calculate(pos1, pos2, pos3);
-        },
-
-        move: function (x, y) {
-            _reset();
-            _move(x, y);
-
-        },
-
-        zoom: function (n) {
-            _reset();
-            _zoom(n);
+            if(_checkBrowser() == "firefox") {
+                element.addEventListener("DOMMouseScroll", function(event){
+                    return listener(0 - event.detail*20/3, event.clientX, event.clientY);
+                }, false);
+            } else {
+                element.addEventListener("mousewheel", function(event){
+                    return listener(event.wheelDelta/6, event.clientX, event.clientY);
+                }, false);
+            }
         }
-    };
+    }
+	
+	function _addMouseDownListener() {
+		_add(canvas, "mousedown", _mouseDownListener);
+	}
+	
+	function _mouseDownListener(event) {
+		mouseX = (event.clientX - boundry.left)*(canvas.width/boundry.width);
+		mouseY = (event.clientY - boundry.top)*(canvas.height/boundry.height);
+		dragging = true;
+			
+		_add(window, "mousemove", _mouseMoveListener);
+		_add(window, "mouseup", _mouseUpListener);
+		_remove(canvas, "mousedown", _mouseDownListener);
+			
+		if (event.preventDefault) {
+			event.preventDefault();
+		} else if (event.returnValue) {
+			event.returnValue = false;
+		}
+
+		return false;
+	}
+	
+	function _mouseMoveListener(event) {
+		var mouseCrtX = (event.clientX - boundry.left)*(canvas.width/boundry.width);
+        var mouseCrtY = (event.clientY - boundry.top)*(canvas.height/boundry.height);
+
+        var moveX = mouseCrtX - mouseX;
+        var moveY = mouseCrtY - mouseY;
+        mouseX = mouseCrtX;
+        mouseY = mouseCrtY;
+		
+		_move(moveX, moveY);
+	}
+	
+	function _mouseUpListener(event) {
+		_add(canvas, "mousedown", _mouseDownListener);
+		_remove(window, "mouseup", _mouseUpListener);
+		
+		if (dragging) {
+            dragging = false;
+            _remove(window, "mousemove", _mouseMoveListener);
+        }
+	}
+	
+	function _mouseWheelListener(level) {
+		_zoom(level);
+	}
+	
+	function _keyDownListener(event) {
+		switch(event.keyCode){
+            case 38:
+                _move(0, -10);
+                break;
+            case 40:
+                _move(0, 10);
+                break;
+            case 37:
+                _move(-10, 0);
+                break;
+            case 39:
+                _move(10, 0);
+                break;
+            case 107:
+                _zoom(10);
+                break;
+            case 109:
+                _zoom(-10);
+                break;
+            default:
+                break;
+        }
+	}
+	
+	this.init = function() {
+		_addMouseDownListener();
+		_addMouseWheel(canvas, _mouseWheelListener)
+		_add(window, "keydown", _keyDownListener);
+	}
+  }
 }
+
