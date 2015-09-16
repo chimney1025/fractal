@@ -240,10 +240,6 @@ function Triangle(canvas) {
             }
         }
 
-        function _addMouseDownListener() {
-            _add(canvas, "mousedown", _mouseDownListener);
-        }
-
         function _mouseDownListener(event) {
             mouseX = (event.clientX - boundry.left) * (canvas.width / boundry.width);
             mouseY = (event.clientY - boundry.top) * (canvas.height / boundry.height);
@@ -314,7 +310,7 @@ function Triangle(canvas) {
         }
 
         this.init = function() {
-            _addMouseDownListener();
+            _add(canvas, "mousedown", _mouseDownListener);
             _addMouseWheel(canvas, _mouseWheelListener)
             _add(window, "keydown", _keyDownListener);
         }
