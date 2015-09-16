@@ -27,34 +27,21 @@
     -->
     </div>
 
-    <canvas id="canvas" width="800" height="400"></canvas>
+    <canvas id="canvas"></canvas>
 
 
     <script src="triangle.js"></script>
     <script>
-        var canvas = document.getElementById("canvas");
-        var triangle = new Triangle(canvas);
-        triangle.draw(100);
 
-        document.getElementById("zoomIn").addEventListener("click", function() {
-            triangle.zoom(10);
-            //triangle.move(0, -10);
-        });
+        var canvas = new Canvas();
+        canvas.drawSierpinski();
 
-        document.getElementById("zoomOut").addEventListener("click", function() {
-            triangle.zoom(-10);
-            //triangle.move(0, 10);
-        });
+        
+        window.onresize = function(){
+            canvas = new Canvas();
+            canvas.drawSierpinski();
+        };
 
-        /*
-        document.getElementById("scaleIn").addEventListener("click", function(){
-        triangle.scale(1.25);
-        });
-
-        document.getElementById("scaleOut").addEventListener("click", function(){
-        triangle.scale(0.8);
-        });
-	    */
     </script>
 
 </body>
