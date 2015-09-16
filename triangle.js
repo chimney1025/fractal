@@ -28,32 +28,32 @@ function Triangle(canvas) {
         pencil.clearRect(0 - sideLength, 0 - sideLength, sideLength * 2, sideLength * 2);
     }
 
-    function _checkLimit(option) {
-        return ((option.pos3.x - option.pos2.x) > limit);
+    function _checkLimit(shapeOption) {
+        return ((shapeOption.pos3.x - shapeOption.pos2.x) > limit);
     }
 
-    function _calculate(option) {
-        if (_checkLimit(option)) {
-            _calculateInner(option);
-            _calculateTop(option);
-            _calculateLeft(option);
-            _calculateRight(option);
+    function _calculate(shapeOption) {
+        if (_checkLimit(shapeOption)) {
+            _calculateInner(shapeOption);
+            _calculateTopTriangle(shapeOption);
+            _calculateLeftTriangle(shapeOption);
+            _calculateRightTriangle(shapeOption);
         }
     }
 
-    function _calculateInner(option) {
+    function _calculateInner(shapeOption) {
         var option = {
             pos1: {
-                x: (option.pos1.x + option.pos2.x) / 2,
-                y: (option.pos1.y + option.pos2.y) / 2
+                x: (shapeOption.pos1.x + shapeOption.pos2.x) / 2,
+                y: (shapeOption.pos1.y + shapeOption.pos2.y) / 2
             },
             pos2: {
-                x: (option.pos1.x + option.pos3.x) / 2,
-                y: (option.pos1.y + option.pos3.y) / 2
+                x: (shapeOption.pos1.x + shapeOption.pos3.x) / 2,
+                y: (shapeOption.pos1.y + shapeOption.pos3.y) / 2
             },
             pos3: {
-                x: (option.pos2.x + option.pos3.x) / 2,
-                y: (option.pos2.y + option.pos3.y) / 2
+                x: (shapeOption.pos2.x + shapeOption.pos3.x) / 2,
+                y: (shapeOption.pos2.y + shapeOption.pos3.y) / 2
             },
             style: "fill"
         };
@@ -61,19 +61,19 @@ function Triangle(canvas) {
         shape.draw(option);
     }
 
-    function _calculateTop(option) {
+    function _calculateTopTriangle(shapeOption) {
         var option = {
             pos1: {
-                x: option.pos1.x,
-                y: option.pos1.y
+                x: shapeOption.pos1.x,
+                y: shapeOption.pos1.y
             },
             pos2: {
-                x: (option.pos1.x + option.pos2.x) / 2,
-                y: (option.pos1.y + option.pos2.y) / 2
+                x: (shapeOption.pos1.x + shapeOption.pos2.x) / 2,
+                y: (shapeOption.pos1.y + shapeOption.pos2.y) / 2
             },
             pos3: {
-                x: (option.pos1.x + option.pos3.x) / 2,
-                y: (option.pos1.y + option.pos3.y) / 2
+                x: (shapeOption.pos1.x + shapeOption.pos3.x) / 2,
+                y: (shapeOption.pos1.y + shapeOption.pos3.y) / 2
             },
             style: "fill"
         };
@@ -81,19 +81,19 @@ function Triangle(canvas) {
         _calculate(option);
     }
 
-    function _calculateLeft(option) {
+    function _calculateLeftTriangle(shapeOption) {
         var option = {
             pos1: {
-                x: (option.pos1.x + option.pos2.x) / 2,
-                y: (option.pos1.y + option.pos2.y) / 2
+                x: (shapeOption.pos1.x + shapeOption.pos2.x) / 2,
+                y: (shapeOption.pos1.y + shapeOption.pos2.y) / 2
             },
             pos2: {
-                x: option.pos2.x,
-                y: option.pos2.y
+                x: shapeOption.pos2.x,
+                y: shapeOption.pos2.y
             },
             pos3: {
-                x: (option.pos2.x + option.pos3.x) / 2,
-                y: (option.pos2.y + option.pos3.y) / 2
+                x: (shapeOption.pos2.x + shapeOption.pos3.x) / 2,
+                y: (shapeOption.pos2.y + shapeOption.pos3.y) / 2
             },
             style: "fill"
         };
@@ -101,19 +101,19 @@ function Triangle(canvas) {
         _calculate(option);
     }
 
-    function _calculateRight(option) {
+    function _calculateRightTriangle(shapeOption) {
         var option = {
             pos1: {
-                x: (option.pos1.x + option.pos3.x) / 2,
-                y: (option.pos1.y + option.pos3.y) / 2
+                x: (shapeOption.pos1.x + shapeOption.pos3.x) / 2,
+                y: (shapeOption.pos1.y + shapeOption.pos3.y) / 2
             },
             pos2: {
-                x: (option.pos2.x + option.pos3.x) / 2,
-                y: (option.pos2.y + option.pos3.y) / 2
+                x: (shapeOption.pos2.x + shapeOption.pos3.x) / 2,
+                y: (shapeOption.pos2.y + shapeOption.pos3.y) / 2
             },
             pos3: {
-                x: option.pos3.x,
-                y: option.pos3.y
+                x: shapeOption.pos3.x,
+                y: shapeOption.pos3.y
             },
             style: "fill"
         };
@@ -177,24 +177,24 @@ function Triangle(canvas) {
     }
 
     function Shape() {
-        function _draw(option) {
+        function _draw(shapeOption) {
             pencil.beginPath();
-            pencil.moveTo(option.pos1.x, option.pos1.y);
-            pencil.lineTo(option.pos2.x, option.pos2.y);
-            pencil.lineTo(option.pos3.x, option.pos3.y);
+            pencil.moveTo(shapeOption.pos1.x, shapeOption.pos1.y);
+            pencil.lineTo(shapeOption.pos2.x, shapeOption.pos2.y);
+            pencil.lineTo(shapeOption.pos3.x, shapeOption.pos3.y);
 
-            if (option.style == "stroke") {
+            if (shapeOption.style == "stroke") {
                 pencil.closePath();
                 pencil.stroke();
             }
 
-            if (option.style == "fill") {
+            if (shapeOption.style == "fill") {
                 pencil.fill();
             }
         };
 
-        this.draw = function(option) {
-            _draw(option);
+        this.draw = function(shapeOption) {
+            _draw(shapeOption);
         }
     }
 
