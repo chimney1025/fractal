@@ -1,4 +1,3 @@
-
 function Canvas(){
     SIDE_LENGTH = 100;
     ZOOM_LEVEL = 10;
