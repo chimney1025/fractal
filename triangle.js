@@ -1,11 +1,11 @@
 function Triangle(canvas) {
-    var MIN_SIDE_LENGTH = 10;
+    var MIN_SIDE_LENGTH = 5;
+    var MIN_TRIANGLE_LENGTH = 20;
     var sideLength = (canvas.width < canvas.height) ? canvas.width : canvas.height;
     var pencil = canvas.getContext("2d");
     pencil.translate(canvas.width / 2, canvas.height / 2);
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
-    var shape;
 
     this.draw = function (sideLength) {
         _draw(sideLength);
@@ -58,7 +58,7 @@ function Triangle(canvas) {
             style: "fill"
         };
 
-        shape.draw(option);
+        _drawShape(option);
     }
 
     function _calculateTopTriangle(shapeOption) {
@@ -123,7 +123,6 @@ function Triangle(canvas) {
 
     function _draw(newLength) {
         sideLength = newLength || sideLength;
-        shape = new Shape();
 
         var outer_option = {
             pos1: {
@@ -141,7 +140,7 @@ function Triangle(canvas) {
             style: "stroke"
         };
 
-        shape.draw(outer_option);
+        _drawShape(outer_option);
 
         var inner_option = {
             pos1: {
@@ -169,32 +168,26 @@ function Triangle(canvas) {
     }
 
     function _zoom(n) {
-        if (n > 0 || sideLength > MIN_SIDE_LENGTH) {
+        if (n > 0 || sideLength > MIN_TRIANGLE_LENGTH) {
             _clear();
             sideLength += n;
             _draw(sideLength);
         }
     }
+	
+	function _drawShape(shapeOption) {
+        pencil.beginPath();
+        pencil.moveTo(shapeOption.pos1.x, shapeOption.pos1.y);
+        pencil.lineTo(shapeOption.pos2.x, shapeOption.pos2.y);
+        pencil.lineTo(shapeOption.pos3.x, shapeOption.pos3.y);
+		
+        if (shapeOption.style == "stroke") {
+            pencil.closePath();
+            pencil.stroke();
+        }
 
-    function Shape() {
-        function _draw(shapeOption) {
-            pencil.beginPath();
-            pencil.moveTo(shapeOption.pos1.x, shapeOption.pos1.y);
-            pencil.lineTo(shapeOption.pos2.x, shapeOption.pos2.y);
-            pencil.lineTo(shapeOption.pos3.x, shapeOption.pos3.y);
-
-            if (shapeOption.style == "stroke") {
-                pencil.closePath();
-                pencil.stroke();
-            }
-
-            if (shapeOption.style == "fill") {
-                pencil.fill();
-            }
-        };
-
-        this.draw = function (shapeOption) {
-            _draw(shapeOption);
+        if (shapeOption.style == "fill") {
+            pencil.fill();
         }
     }
 }
@@ -202,6 +195,8 @@ function Triangle(canvas) {
 
 function TriangleController() {
     var canvas, boundary, dragging, mouseX, mouseY;
+	var MOVE_LEVEL = 10;
+	var ZOOM_LEVEL = 10;
 
     function _checkBrowser() {
         if (navigator.userAgent.indexOf("Firefox") != -1) {
@@ -228,17 +223,17 @@ function TriangleController() {
     function _addMouseWheel(element, listener) {
         if (element.attachEvent) {
             element.attachEvent("onmousewheel", function (event) {
-                return listener(event.wheelDelta / 12);
+                return listener(ZOOM_LEVEL * event.wheelDelta / 120);
             });
         } else if (element.addEventListener) {
 
             if (_checkBrowser() == "firefox") {
                 element.addEventListener("DOMMouseScroll", function (event) {
-                    return listener(0 - event.detail * 20 / 3, event.clientX, event.clientY);
+                    return listener(0 - ZOOM_LEVEL * event.detail / 3, event.clientX, event.clientY);
                 }, false);
             } else {
                 element.addEventListener("mousewheel", function (event) {
-                    return listener(event.wheelDelta / 6, event.clientX, event.clientY);
+                    return listener(ZOOM_LEVEL * event.wheelDelta / 120, event.clientX, event.clientY);
                 }, false);
             }
         }
@@ -291,22 +286,22 @@ function TriangleController() {
     function _keyDownListener(event) {
         switch (event.keyCode) {
             case 38:
-                triangle.move(0, -10);
+                triangle.move(0, 0 - MOVE_LEVEL);
                 break;
             case 40:
-                triangle.move(0, 10);
+                triangle.move(0, MOVE_LEVEL);
                 break;
             case 37:
-                triangle.move(-10, 0);
+                triangle.move(0 - MOVE_LEVEL, 0);
                 break;
             case 39:
-                triangle.move(10, 0);
+                triangle.move(MOVE_LEVEL, 0);
                 break;
             case 107:
-                triangle.zoom(10);
+                triangle.zoom(MOVE_LEVEL);
                 break;
             case 109:
-                triangle.zoom(-10);
+                triangle.zoom(0 - MOVE_LEVEL);
                 break;
             default:
                 break;

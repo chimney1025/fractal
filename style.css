@@ -78,34 +78,3 @@ img#zoomOut {
     width: 120px;
     height: 54px;
 }
-
-
-button {
-    border: 0 none;
-    font-size: 13px;
-    padding: 8px 26px;
-    background-color: #3fb8af;
-    cursor: pointer;
-    display: block;
-    margin: 5px 0;
-    color: #fff;
-    text-transform: uppercase;
-}
-
-button:hover{
-    background-color: #32928b;
-}
-
-button.reset {
-    background-color: #e7746f;
-}
-
-button.reset:hover {
-    background-color: #e04a43;
-}
-button.zoom {
-    background-color: #d2d2d2;
-}
-button.zoom:hover {
-    background-color: #e7e7e7;
-}
