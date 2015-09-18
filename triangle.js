@@ -7,15 +7,15 @@ function Triangle(canvas) {
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
 
-    this.draw = function (sideLength) {
+    this.draw = function(sideLength) {
         _draw(sideLength);
     };
 
-    this.move = function (x, y) {
+    this.move = function(x, y) {
         _move(x, y);
     };
 
-    this.zoom = function (n) {
+    this.zoom = function(n) {
         _zoom(n);
     };
 
@@ -26,6 +26,22 @@ function Triangle(canvas) {
 
     function _clear() {
         pencil.clearRect(0 - sideLength, 0 - sideLength, sideLength * 2, sideLength * 2);
+    }
+
+    function _drawShape(shapeOption) {
+        pencil.beginPath();
+        pencil.moveTo(shapeOption.pos1.x, shapeOption.pos1.y);
+        pencil.lineTo(shapeOption.pos2.x, shapeOption.pos2.y);
+        pencil.lineTo(shapeOption.pos3.x, shapeOption.pos3.y);
+
+        if (shapeOption.style == "stroke") {
+            pencil.closePath();
+            pencil.stroke();
+        }
+
+        if (shapeOption.style == "fill") {
+            pencil.fill();
+        }
     }
 
     function _checkLimit(shapeOption) {
@@ -174,29 +190,13 @@ function Triangle(canvas) {
             _draw(sideLength);
         }
     }
-	
-	function _drawShape(shapeOption) {
-        pencil.beginPath();
-        pencil.moveTo(shapeOption.pos1.x, shapeOption.pos1.y);
-        pencil.lineTo(shapeOption.pos2.x, shapeOption.pos2.y);
-        pencil.lineTo(shapeOption.pos3.x, shapeOption.pos3.y);
-		
-        if (shapeOption.style == "stroke") {
-            pencil.closePath();
-            pencil.stroke();
-        }
-
-        if (shapeOption.style == "fill") {
-            pencil.fill();
-        }
-    }
 }
 
 
 function TriangleController() {
     var canvas, boundary, dragging, mouseX, mouseY;
-	var MOVE_LEVEL = 10;
-	var ZOOM_LEVEL = 10;
+    var MOVE_LEVEL = 10;
+    var ZOOM_LEVEL = 10;
 
     function _checkBrowser() {
         if (navigator.userAgent.indexOf("Firefox") != -1) {
@@ -222,17 +222,17 @@ function TriangleController() {
 
     function _addMouseWheel(element, listener) {
         if (element.attachEvent) {
-            element.attachEvent("onmousewheel", function (event) {
+            element.attachEvent("onmousewheel", function(event) {
                 return listener(ZOOM_LEVEL * event.wheelDelta / 120);
             });
         } else if (element.addEventListener) {
 
             if (_checkBrowser() == "firefox") {
-                element.addEventListener("DOMMouseScroll", function (event) {
+                element.addEventListener("DOMMouseScroll", function(event) {
                     return listener(0 - ZOOM_LEVEL * event.detail / 3, event.clientX, event.clientY);
                 }, false);
             } else {
-                element.addEventListener("mousewheel", function (event) {
+                element.addEventListener("mousewheel", function(event) {
                     return listener(ZOOM_LEVEL * event.wheelDelta / 120, event.clientX, event.clientY);
                 }, false);
             }

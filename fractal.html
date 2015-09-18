@@ -6,23 +6,22 @@
 </head>
 
 <body>
-    <div id="config">
-        <div class="control">
-            <div title="Zoom in">
-                <div>
-                    <img id="zoomIn" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
-                </div>
+<div class="container">
+    <div class="control">
+        <div title="Zoom in">
+            <div>
+                <img id="zoomIn" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
             </div>
-            <div title="Zoom out" id="zoomOut">
-                <div>
-                    <img id="zoomOut" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
-                </div>
+        </div>
+        <div title="Zoom out" id="zoomOut">
+            <div>
+                <img id="zoomOut" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
             </div>
         </div>
     </div>
 
     <canvas id="canvas"></canvas>
-
+</div>
 
     <script src="triangle.js"></script>
     <script>
@@ -32,8 +31,8 @@
         var SIDE_LENGTH = 100;
         var ZOOM_LEVEL = 10;
 
-        canvas.width = window.innerWidth - CANVAS_MARGIN;
-        canvas.height = window.innerHeight - CANVAS_MARGIN;
+        canvas.width = window.innerWidth - CANVAS_MARGIN - 4;
+        canvas.height = window.innerHeight - CANVAS_MARGIN - 4;
 
         var triangle = new Triangle(canvas);
         var controller = new TriangleController();
