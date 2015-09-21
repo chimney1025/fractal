@@ -1,35 +1,34 @@
 function Triangle(canvas) {
+    var MIN_DRAW_LENGTH = 5;
+    var MIN_TRIANGLE_SIZE = 20;
     var sideLength = (canvas.width < canvas.height) ? canvas.width : canvas.height;
-    var boundry = canvas.getBoundingClientRect();
     var pencil = canvas.getContext("2d");
     pencil.translate(canvas.width / 2, canvas.height / 2);
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
-    var limit = 10;
-    var dragging, mouseX, mouseY;
-    var shape;
-    var listener = new Listener();
-    listener.init();
-
-    this.draw = function(sideLength) {
-        _draw(sideLength);
-    };
-
-    this.move = function(x, y) {
-        _move(x, y);
-    };
-
-    this.zoom = function(n) {
-        _zoom(n);
-    };
-
 
     function _clear() {
         pencil.clearRect(0 - sideLength, 0 - sideLength, sideLength * 2, sideLength * 2);
     }
 
+    function _drawShape(shapeOption) {
+        pencil.beginPath();
+        pencil.moveTo(shapeOption.pos1.x, shapeOption.pos1.y);
+        pencil.lineTo(shapeOption.pos2.x, shapeOption.pos2.y);
+        pencil.lineTo(shapeOption.pos3.x, shapeOption.pos3.y);
+
+        if (shapeOption.style == "stroke") {
+            pencil.closePath();
+            pencil.stroke();
+        }
+
+        if (shapeOption.style == "fill") {
+            pencil.fill();
+        }
+    }
+
     function _checkLimit(shapeOption) {
-        return ((shapeOption.pos3.x - shapeOption.pos2.x) > limit);
+        return ((shapeOption.pos3.x - shapeOption.pos2.x) > MIN_DRAW_LENGTH);
     }
 
     function _calculate(shapeOption) {
@@ -58,7 +57,7 @@ function Triangle(canvas) {
             style: "fill"
         };
 
-        shape.draw(option);
+        _drawShape(option);
     }
 
     function _calculateTopTriangle(shapeOption) {
@@ -123,7 +122,6 @@ function Triangle(canvas) {
 
     function _draw(newLength) {
         sideLength = newLength || sideLength;
-        shape = new Shape();
 
         var outer_option = {
             pos1: {
@@ -141,7 +139,7 @@ function Triangle(canvas) {
             style: "stroke"
         };
 
-        shape.draw(outer_option);
+        _drawShape(outer_option);
 
         var inner_option = {
             pos1: {
@@ -169,150 +167,173 @@ function Triangle(canvas) {
     }
 
     function _zoom(n) {
-        if (n > 0 || sideLength > limit) {
+        if (n > 0 || sideLength > MIN_TRIANGLE_SIZE) {
             _clear();
             sideLength += n;
             _draw(sideLength);
         }
     }
 
-    function Shape() {
-        function _draw(shapeOption) {
-            pencil.beginPath();
-            pencil.moveTo(shapeOption.pos1.x, shapeOption.pos1.y);
-            pencil.lineTo(shapeOption.pos2.x, shapeOption.pos2.y);
-            pencil.lineTo(shapeOption.pos3.x, shapeOption.pos3.y);
+    return {
+        draw: function (sideLength) {
+            _draw(sideLength);
+        },
 
-            if (shapeOption.style == "stroke") {
-                pencil.closePath();
-                pencil.stroke();
-            }
+        move: function (x, y) {
+            _move(x, y);
+        },
 
-            if (shapeOption.style == "fill") {
-                pencil.fill();
-            }
-        };
+        zoom: function (n) {
+            _zoom(n);
+        },
 
-        this.draw = function(shapeOption) {
-            _draw(shapeOption);
+        getCanvas: function () {
+            return canvas;
+        }
+    };
+}
+
+
+function TriangleController() {
+    var canvas, boundary, dragging, mouseX, mouseY;
+    var MOVE_LEVEL = 10;
+    var ZOOM_LEVEL = 10;
+
+    function _checkBrowser() {
+        if (navigator.userAgent.indexOf("Firefox") != -1) {
+            return "firefox";
         }
     }
 
-    function Listener() {
-        function _checkBrowser() {
-            if (navigator.userAgent.indexOf("Firefox") != -1) {
-                return "firefox";
+    function _preventDefault(event) {
+        if (event.preventDefault) {
+            event.preventDefault();
+        } else if (event.returnValue) {
+            event.returnValue = false;
+        }
+    }
+
+    function _add(element, eventName, listener) {
+        if (element.attachEvent) {
+            element.attachEvent("on" + eventName, listener);
+        } else if (element.addEventListener) {
+            element.addEventListener(eventName, listener, false);
+        }
+    }
+
+    function _remove(element, eventName, listener) {
+        if (element.detachEvent) {
+            element.detachEvent("on" + eventName, listener);
+        } else if (element.removeEventListener) {
+            element.removeEventListener(eventName, listener, false);
+        }
+    }
+
+    function _addMouseWheel(element, listener) {
+        if (element.attachEvent) {
+            element.attachEvent("onmousewheel", function(event) {
+                _preventDefault(event);
+                return listener(ZOOM_LEVEL * event.wheelDelta / 120);
+            });
+        } else if (element.addEventListener) {
+
+            if (_checkBrowser() == "firefox") {
+                element.addEventListener("DOMMouseScroll", function(event) {
+                    _preventDefault(event);
+                    return listener(0 - ZOOM_LEVEL * event.detail / 3, event.clientX, event.clientY);
+                }, false);
+            } else {
+                element.addEventListener("mousewheel", function(event) {
+                    _preventDefault(event);
+                    return listener(ZOOM_LEVEL * event.wheelDelta / 120, event.clientX, event.clientY);
+                }, false);
             }
         }
+    }
 
-        function _add(element, eventName, listener) {
-            if (element.attachEvent) {
-                element.attachEvent("on" + eventName, listener);
-            } else if (element.addEventListener) {
-                element.addEventListener(eventName, listener, false);
-            }
+    function _mouseDownListener(event) {
+        mouseX = (event.clientX - boundary.left) * (canvas.width / boundary.width);
+        mouseY = (event.clientY - boundary.top) * (canvas.height / boundary.height);
+        dragging = true;
+
+        _add(window, "mousemove", _mouseMoveListener);
+        _add(window, "mouseup", _mouseUpListener);
+        _remove(canvas, "mousedown", _mouseDownListener);
+
+        _preventDefault(event);
+
+        return false;
+    }
+
+    function _mouseMoveListener(event) {
+        var mouseCrtX = (event.clientX - boundary.left) * (canvas.width / boundary.width);
+        var mouseCrtY = (event.clientY - boundary.top) * (canvas.height / boundary.height);
+
+        var moveX = mouseCrtX - mouseX;
+        var moveY = mouseCrtY - mouseY;
+        mouseX = mouseCrtX;
+        mouseY = mouseCrtY;
+
+        triangle.move(moveX, moveY);
+    }
+
+    function _mouseUpListener(event) {
+        _add(canvas, "mousedown", _mouseDownListener);
+        _remove(window, "mouseup", _mouseUpListener);
+
+        if (dragging) {
+            dragging = false;
+            _remove(window, "mousemove", _mouseMoveListener);
         }
+    }
 
-        function _remove(element, eventName, listener) {
-            if (element.detachEvent) {
-                element.detachEvent("on" + eventName, listener);
-            } else if (element.removeEventListener) {
-                element.removeEventListener(eventName, listener, false);
-            }
+    function _mouseWheelListener(level) {
+        triangle.zoom(level);
+    }
+
+    function _keyDownListener(event) {
+        switch (event.keyCode) {
+            case 38:
+                _preventDefault(event);
+                triangle.move(0, 0 - MOVE_LEVEL);
+                break;
+            case 40:
+                _preventDefault(event);
+                triangle.move(0, MOVE_LEVEL);
+                break;
+            case 37:
+                _preventDefault(event);
+                triangle.move(0 - MOVE_LEVEL, 0);
+                break;
+            case 39:
+                _preventDefault(event);
+                triangle.move(MOVE_LEVEL, 0);
+                break;
+			case 187:
+            case 61:
+            case 107:
+                _preventDefault(event);
+                triangle.zoom(MOVE_LEVEL);
+                break;
+			case 189:
+            case 173:
+            case 109:
+                _preventDefault(event);
+                triangle.zoom(0 - MOVE_LEVEL);
+                break;
+            default:
+                break;
         }
+    }
 
-        function _addMouseWheel(element, listener) {
-            if (element.attachEvent) {
-                element.attachEvent("onmousewheel", function(event) {
-                    return listener(event.wheelDelta / 12);
-                });
-            } else if (element.addEventListener) {
+    return {
+        register: function (triangle) {
+            canvas = triangle.getCanvas();
+            boundary = canvas.getBoundingClientRect();
 
-                if (_checkBrowser() == "firefox") {
-                    element.addEventListener("DOMMouseScroll", function(event) {
-                        return listener(0 - event.detail * 20 / 3, event.clientX, event.clientY);
-                    }, false);
-                } else {
-                    element.addEventListener("mousewheel", function(event) {
-                        return listener(event.wheelDelta / 6, event.clientX, event.clientY);
-                    }, false);
-                }
-            }
-        }
-
-        function _mouseDownListener(event) {
-            mouseX = (event.clientX - boundry.left) * (canvas.width / boundry.width);
-            mouseY = (event.clientY - boundry.top) * (canvas.height / boundry.height);
-            dragging = true;
-
-            _add(window, "mousemove", _mouseMoveListener);
-            _add(window, "mouseup", _mouseUpListener);
-            _remove(canvas, "mousedown", _mouseDownListener);
-
-            if (event.preventDefault) {
-                event.preventDefault();
-            } else if (event.returnValue) {
-                event.returnValue = false;
-            }
-
-            return false;
-        }
-
-        function _mouseMoveListener(event) {
-            var mouseCrtX = (event.clientX - boundry.left) * (canvas.width / boundry.width);
-            var mouseCrtY = (event.clientY - boundry.top) * (canvas.height / boundry.height);
-
-            var moveX = mouseCrtX - mouseX;
-            var moveY = mouseCrtY - mouseY;
-            mouseX = mouseCrtX;
-            mouseY = mouseCrtY;
-
-            _move(moveX, moveY);
-        }
-
-        function _mouseUpListener(event) {
-            _add(canvas, "mousedown", _mouseDownListener);
-            _remove(window, "mouseup", _mouseUpListener);
-
-            if (dragging) {
-                dragging = false;
-                _remove(window, "mousemove", _mouseMoveListener);
-            }
-        }
-
-        function _mouseWheelListener(level) {
-            _zoom(level);
-        }
-
-        function _keyDownListener(event) {
-            switch (event.keyCode) {
-                case 38:
-                    _move(0, -10);
-                    break;
-                case 40:
-                    _move(0, 10);
-                    break;
-                case 37:
-                    _move(-10, 0);
-                    break;
-                case 39:
-                    _move(10, 0);
-                    break;
-                case 107:
-                    _zoom(10);
-                    break;
-                case 109:
-                    _zoom(-10);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        this.init = function() {
             _add(canvas, "mousedown", _mouseDownListener);
             _addMouseWheel(canvas, _mouseWheelListener)
             _add(window, "keydown", _keyDownListener);
         }
-    }
+    };
 }
