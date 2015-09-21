@@ -309,11 +309,13 @@ function TriangleController() {
                 _preventDefault(event);
                 triangle.move(MOVE_LEVEL, 0);
                 break;
+			case 187:
             case 61:
             case 107:
                 _preventDefault(event);
                 triangle.zoom(MOVE_LEVEL);
                 break;
+			case 189:
             case 173:
             case 109:
                 _preventDefault(event);
