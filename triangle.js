@@ -7,23 +7,6 @@ function Triangle(canvas) {
     pencil.strokeStyle = "#e7746f";
     pencil.fillStyle = "#e7746f";
 
-    this.draw = function(sideLength) {
-        _draw(sideLength);
-    };
-
-    this.move = function(x, y) {
-        _move(x, y);
-    };
-
-    this.zoom = function(n) {
-        _zoom(n);
-    };
-
-    this.getCanvas = function() {
-        return canvas;
-    }
-
-
     function _clear() {
         pencil.clearRect(0 - sideLength, 0 - sideLength, sideLength * 2, sideLength * 2);
     }
@@ -190,6 +173,24 @@ function Triangle(canvas) {
             _draw(sideLength);
         }
     }
+
+    return {
+        draw : function(sideLength) {
+            _draw(sideLength);
+        },
+
+        move : function(x, y) {
+            _move(x, y);
+        },
+
+        zoom : function(n) {
+            _zoom(n);
+        },
+
+        getCanvas : function() {
+            return canvas;
+        }
+    }
 }
 
 
@@ -308,12 +309,14 @@ function TriangleController() {
         }
     }
 
-    this.bind = function(triangle) {
-        canvas = triangle.getCanvas();
-        boundary = canvas.getBoundingClientRect();
+    return {
+        bind : function(triangle) {
+            canvas = triangle.getCanvas();
+            boundary = canvas.getBoundingClientRect();
 
-        _add(canvas, "mousedown", _mouseDownListener);
-        _addMouseWheel(canvas, _mouseWheelListener)
-        _add(window, "keydown", _keyDownListener);
+            _add(canvas, "mousedown", _mouseDownListener);
+            _addMouseWheel(canvas, _mouseWheelListener)
+            _add(window, "keydown", _keyDownListener);
+        }
     }
 }
