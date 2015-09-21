@@ -1,53 +1,63 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Sierpinski Triangle</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+        
+        body {
+            overflow: hidden;
+            background-color: #eee;
+            color: #333;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+        }
+        
+        .container {
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        #canvas {
+            background-color: #fff;
+            border: 2px solid #aaa;
+            z-index: 0;
+            margin: 10px;
+            padding: 0;
+        }
+        
+        #canvas:active {
+            cursor: move;
+        }
+    </style>
 </head>
 
 <body>
-<div class="container">
-    <div class="control">
-        <div title="Zoom in">
-            <div>
-                <img id="zoomIn" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
-            </div>
-        </div>
-        <div title="Zoom out" id="zoomOut">
-            <div>
-                <img id="zoomOut" src="https://maps.gstatic.com/mapfiles/api-3/images/tmapctrl.png" draggable="false">
-            </div>
-        </div>
+    <div class="container">
+        <h2>Sierpinski Triangle</h2>
+        <p>Use your mouse to drag and move the triangle
+            <br>Use your mousewheel to zoom the triangle.
+            <br>Or
+            <br>Use arrow keys to move the triangle
+            <br>Use '+/=' and '_/-' keys to zoom it.
+        </p>
+        <canvas id="canvas" width="800" height="400"></canvas>
     </div>
-
-    <canvas id="canvas"></canvas>
-</div>
-
     <script src="triangle.js"></script>
     <script>
-
         var canvas = document.getElementById("canvas");
-        var CANVAS_MARGIN = 100;
         var SIDE_LENGTH = 100;
         var ZOOM_LEVEL = 10;
 
-        canvas.width = window.innerWidth - CANVAS_MARGIN - 4;
-        canvas.height = window.innerHeight - CANVAS_MARGIN - 4;
-
         var triangle = new Triangle(canvas);
         var controller = new TriangleController();
-        controller.bind(triangle);
+        controller.register(triangle);
         triangle.draw(SIDE_LENGTH);
-
-        document.getElementById("zoomIn").addEventListener("click", function () {
-            triangle.zoom(ZOOM_LEVEL);
-        });
-
-        document.getElementById("zoomOut").addEventListener("click", function () {
-            triangle.zoom(0 - ZOOM_LEVEL);
-        });
-
     </script>
-
 </body>
+
 </html>

@@ -1,6 +1,6 @@
 function Triangle(canvas) {
-    var MIN_SIDE_LENGTH = 5;
-    var MIN_TRIANGLE_LENGTH = 20;
+    var MIN_DRAW_LENGTH = 5;
+    var MIN_TRIANGLE_SIZE = 20;
     var sideLength = (canvas.width < canvas.height) ? canvas.width : canvas.height;
     var pencil = canvas.getContext("2d");
     pencil.translate(canvas.width / 2, canvas.height / 2);
@@ -28,7 +28,7 @@ function Triangle(canvas) {
     }
 
     function _checkLimit(shapeOption) {
-        return ((shapeOption.pos3.x - shapeOption.pos2.x) > MIN_SIDE_LENGTH);
+        return ((shapeOption.pos3.x - shapeOption.pos2.x) > MIN_DRAW_LENGTH);
     }
 
     function _calculate(shapeOption) {
@@ -167,7 +167,7 @@ function Triangle(canvas) {
     }
 
     function _zoom(n) {
-        if (n > 0 || sideLength > MIN_TRIANGLE_LENGTH) {
+        if (n > 0 || sideLength > MIN_TRIANGLE_SIZE) {
             _clear();
             sideLength += n;
             _draw(sideLength);
@@ -175,22 +175,22 @@ function Triangle(canvas) {
     }
 
     return {
-        draw : function(sideLength) {
+        draw: function (sideLength) {
             _draw(sideLength);
         },
 
-        move : function(x, y) {
+        move: function (x, y) {
             _move(x, y);
         },
 
-        zoom : function(n) {
+        zoom: function (n) {
             _zoom(n);
         },
 
-        getCanvas : function() {
+        getCanvas: function () {
             return canvas;
         }
-    }
+    };
 }
 
 
@@ -202,6 +202,14 @@ function TriangleController() {
     function _checkBrowser() {
         if (navigator.userAgent.indexOf("Firefox") != -1) {
             return "firefox";
+        }
+    }
+
+    function _preventDefault(event) {
+        if (event.preventDefault) {
+            event.preventDefault();
+        } else if (event.returnValue) {
+            event.returnValue = false;
         }
     }
 
@@ -224,16 +232,19 @@ function TriangleController() {
     function _addMouseWheel(element, listener) {
         if (element.attachEvent) {
             element.attachEvent("onmousewheel", function(event) {
+                _preventDefault(event);
                 return listener(ZOOM_LEVEL * event.wheelDelta / 120);
             });
         } else if (element.addEventListener) {
 
             if (_checkBrowser() == "firefox") {
                 element.addEventListener("DOMMouseScroll", function(event) {
+                    _preventDefault(event);
                     return listener(0 - ZOOM_LEVEL * event.detail / 3, event.clientX, event.clientY);
                 }, false);
             } else {
                 element.addEventListener("mousewheel", function(event) {
+                    _preventDefault(event);
                     return listener(ZOOM_LEVEL * event.wheelDelta / 120, event.clientX, event.clientY);
                 }, false);
             }
@@ -249,11 +260,7 @@ function TriangleController() {
         _add(window, "mouseup", _mouseUpListener);
         _remove(canvas, "mousedown", _mouseDownListener);
 
-        if (event.preventDefault) {
-            event.preventDefault();
-        } else if (event.returnValue) {
-            event.returnValue = false;
-        }
+        _preventDefault(event);
 
         return false;
     }
@@ -287,21 +294,29 @@ function TriangleController() {
     function _keyDownListener(event) {
         switch (event.keyCode) {
             case 38:
+                _preventDefault(event);
                 triangle.move(0, 0 - MOVE_LEVEL);
                 break;
             case 40:
+                _preventDefault(event);
                 triangle.move(0, MOVE_LEVEL);
                 break;
             case 37:
+                _preventDefault(event);
                 triangle.move(0 - MOVE_LEVEL, 0);
                 break;
             case 39:
+                _preventDefault(event);
                 triangle.move(MOVE_LEVEL, 0);
                 break;
+            case 61:
             case 107:
+                _preventDefault(event);
                 triangle.zoom(MOVE_LEVEL);
                 break;
+            case 173:
             case 109:
+                _preventDefault(event);
                 triangle.zoom(0 - MOVE_LEVEL);
                 break;
             default:
@@ -310,7 +325,7 @@ function TriangleController() {
     }
 
     return {
-        bind : function(triangle) {
+        register: function (triangle) {
             canvas = triangle.getCanvas();
             boundary = canvas.getBoundingClientRect();
 
@@ -318,5 +333,5 @@ function TriangleController() {
             _addMouseWheel(canvas, _mouseWheelListener)
             _add(window, "keydown", _keyDownListener);
         }
-    }
+    };
 }
